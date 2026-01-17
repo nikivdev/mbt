@@ -1,0 +1,25 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/maria/tools/search_files"
+
+import(
+  "moonbitlang/core/json"
+  "moonbitlang/maria/tool"
+)
+
+// Values
+fn new(String) -> @tool.Tool[SearchFilesResult]
+
+let prompt : String
+
+// Errors
+
+// Types and methods
+type SearchFilesResult
+impl Show for SearchFilesResult
+impl ToJson for SearchFilesResult
+impl @json.FromJson for SearchFilesResult
+
+// Type aliases
+
+// Traits
+

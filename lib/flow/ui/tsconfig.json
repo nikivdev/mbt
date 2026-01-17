@@ -1,0 +1,19 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/components/ai/*": ["./src/components/ui/shadcn-io/ai/*"],
+      "@/*": ["./src/*"],
+      "@repo/shadcn-ui/*": ["./src/*"]
+    }
+  }
+}

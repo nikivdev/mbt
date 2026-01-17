@@ -1,0 +1,24 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/maria/tools/replace_in_file"
+
+import(
+  "moonbitlang/core/json"
+  "moonbitlang/maria/file"
+  "moonbitlang/maria/tool"
+)
+
+// Values
+fn new(@file.Manager) -> @tool.Tool[WriteResult]
+
+// Errors
+
+// Types and methods
+type WriteResult
+impl Show for WriteResult
+impl ToJson for WriteResult
+impl @json.FromJson for WriteResult
+
+// Type aliases
+
+// Traits
+

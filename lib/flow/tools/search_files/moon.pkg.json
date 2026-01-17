@@ -1,0 +1,23 @@
+{
+  "import": [
+    "moonbitlang/maria/tool",
+    "moonbitlang/maria/internal/fsx",
+    "moonbitlang/maria/internal/path",
+    "moonbitlang/maria/internal/spawn",
+    "moonbitlang/regexp",
+    "moonbitlang/maria/internal/os",
+    "moonbitlang/maria/internal/git"
+  ],
+  "test-import": [
+    "moonbitlang/async",
+    "moonbitlang/maria/internal/mock",
+    "moonbitlang/maria/file",
+    "moonbitlang/maria/agent",
+    "moonbitlang/maria/model",
+    "moonbitlang/maria/openai",
+    "moonbitlang/maria/tools/replace_in_file",
+    "moonbitlang/maria/internal/pino",
+    "moonbitlang/maria/event"
+  ],
+  "wbtest-import": ["moonbitlang/async", "moonbitlang/maria/internal/mock"]
+}

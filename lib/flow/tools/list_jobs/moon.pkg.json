@@ -1,0 +1,7 @@
+{
+  "import": [
+    "moonbitlang/maria/tool",
+    "moonbitlang/maria/job"
+  ],
+  "test-import": ["moonbitlang/async", "moonbitlang/maria/internal/mock"]
+}

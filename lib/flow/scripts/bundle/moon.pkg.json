@@ -1,0 +1,7 @@
+{
+  "is-main": true,
+  "import": [
+    "moonbitlang/async"
+  ],
+  "supported-targets": ["native"]
+}

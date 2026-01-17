@@ -1,0 +1,26 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/maria/tools/todo_read"
+
+import(
+  "moonbitlang/core/json"
+  "moonbitlang/maria/todo"
+  "moonbitlang/maria/tool"
+)
+
+// Values
+fn new(@todo.Todo) -> @tool.Tool[TodoReadResult]
+
+let prompt : String
+
+// Errors
+
+// Types and methods
+type TodoReadResult
+impl Show for TodoReadResult
+impl ToJson for TodoReadResult
+impl @json.FromJson for TodoReadResult
+
+// Type aliases
+
+// Traits
+

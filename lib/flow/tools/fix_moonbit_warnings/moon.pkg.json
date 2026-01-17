@@ -1,0 +1,15 @@
+{
+  "import": [
+    "moonbitlang/maria/internal/moon",
+    "moonbitlang/maria/tool",
+    "moonbitlang/maria/openai",
+    "moonbitlang/maria/internal/path",
+    "moonbitlang/async",
+    "moonbitlang/maria/agent",
+    "moonbitlang/maria/model",
+    "moonbitlang/maria/internal/diagnostics",
+    "moonbitlang/maria/internal/pino",
+    "moonbitlang/maria/internal/uuid",
+    "moonbitlang/async/semaphore"
+  ]
+}

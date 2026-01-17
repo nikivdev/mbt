@@ -1,0 +1,18 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/maria/file"
+
+// Values
+fn manager(cwd~ : String) -> Manager
+
+// Errors
+
+// Types and methods
+pub struct Manager {
+  cwd : String
+  access : Map[String, Int64]
+}
+
+// Type aliases
+
+// Traits
+

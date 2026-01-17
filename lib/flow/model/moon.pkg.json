@@ -1,0 +1,13 @@
+{
+  "import": [
+    "moonbitlang/maria/internal/path",
+    "moonbitlang/maria/internal/fsx",
+    "moonbitlang/maria/internal/os",
+    "moonbitlang/maria/internal/pino"
+  ],
+
+  "wbtest-import": [
+    "moonbitlang/maria/internal/mock",
+    "moonbitlang/async"
+  ]
+}

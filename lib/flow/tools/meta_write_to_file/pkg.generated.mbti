@@ -1,0 +1,29 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/maria/tools/meta_write_to_file"
+
+import(
+  "moonbitlang/core/json"
+  "moonbitlang/maria/agent"
+  "moonbitlang/maria/tool"
+)
+
+// Values
+fn new(@agent.Agent) -> @tool.Tool[MetaWriteToFileResult]
+
+// Errors
+
+// Types and methods
+pub struct MetaWriteToFileResult {
+  path : String
+  message : String
+  diff : String?
+  learning_prompt : String?
+}
+impl Show for MetaWriteToFileResult
+impl ToJson for MetaWriteToFileResult
+impl @json.FromJson for MetaWriteToFileResult
+
+// Type aliases
+
+// Traits
+

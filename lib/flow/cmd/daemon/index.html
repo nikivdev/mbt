@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>MoonBit Task Platform</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      /* Sidebar styles */
+      #sidebar {
+        width: 280px;
+        background: #2c3e50;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+      }
+
+      #sidebar h2 {
+        padding: 20px;
+        background: #34495e;
+        margin: 0;
+        font-size: 1.2em;
+      }
+
+      #taskList {
+        flex: 1;
+        overflow-y: auto;
+      }
+
+      .task-item {
+        padding: 15px 20px;
+        border-bottom: 1px solid #34495e;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      .task-item:hover {
+        background: #34495e;
+      }
+
+      .task-item.active {
+        background: #1abc9c;
+      }
+
+      .task-name {
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .task-cwd {
+        font-size: 0.85em;
+        color: #bdc3c7;
+        word-break: break-all;
+      }
+
+      #createTaskBtn {
+        margin: 20px;
+        padding: 12px;
+        background: #1abc9c;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        font-weight: bold;
+      }
+
+      #createTaskBtn:hover {
+        background: #16a085;
+      }
+
+      /* Modal styles */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal.show {
+        display: flex;
+      }
+
+      .modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        max-width: 500px;
+        width: 90%;
+      }
+
+      .modal-content h3 {
+        margin-bottom: 20px;
+        color: #2c3e50;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #555;
+        font-weight: bold;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1em;
+      }
+
+      .form-group select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1em;
+        background: white;
+        cursor: pointer;
+      }
+
+      .modal-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      .modal-buttons button {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1em;
+      }
+
+      .btn-primary {
+        background: #1abc9c;
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background: #16a085;
+      }
+
+      .btn-secondary {
+        background: #95a5a6;
+        color: white;
+      }
+
+      .btn-secondary:hover {
+        background: #7f8c8d;
+      }
+
+      /* Main content area */
+      #mainContent {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: white;
+      }
+
+      #header {
+        background: #34495e;
+        color: white;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      #header h1 {
+        margin: 0 0 10px 0;
+        font-size: 1.5em;
+      }
+
+      #status {
+        font-size: 0.9em;
+        opacity: 0.9;
+      }
+
+      #noTaskSelected {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #95a5a6;
+        font-size: 1.2em;
+      }
+
+      #taskView {
+        display: none;
+        flex-direction: column;
+        flex: 1;
+        overflow: hidden;
+      }
+
+      #taskView.active {
+        display: flex;
+      }
+
+      #messages {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        background: #fafafa;
+      }
+
+      #inputArea {
+        padding: 20px;
+        background: white;
+        border-top: 1px solid #ddd;
+        display: flex;
+        gap: 10px;
+      }
+
+      #messageInput {
+        flex: 1;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1em;
+      }
+
+      #sendBtn {
+        padding: 12px 30px;
+        background: #1abc9c;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1em;
+        font-weight: bold;
+      }
+
+      #sendBtn:hover {
+        background: #16a085;
+      }
+
+      #sendBtn:disabled {
+        background: #95a5a6;
+        cursor: not-allowed;
+      }
+
+      #modulesBtn {
+        padding: 12px 30px;
+        background: #3498db;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1em;
+        font-weight: bold;
+      }
+
+      #modulesBtn:hover {
+        background: #2980b9;
+      }
+
+      #modulesBtn:disabled {
+        background: #95a5a6;
+        cursor: not-allowed;
+      }
+
+      .message {
+        padding: 5px;
+        margin: 5px 0;
+        background: #f0f0f0;
+        border-radius: 3px;
+      }
+      .time {
+        color: #666;
+        font-size: 0.9em;
+      }
+
+      /* Pretty-printed log entry styles */
+      .log-entry {
+        margin: 15px 0;
+        border-left: 4px solid #ddd;
+        padding: 10px;
+        background: #fafafa;
+        border-radius: 4px;
+      }
+
+      .log-entry.model-loaded {
+        border-left-color: #4caf50;
+      }
+
+      .log-entry.message-added {
+        border-left-color: #2196f3;
+      }
+
+      .log-entry.request-completed {
+        border-left-color: #9c27b0;
+      }
+
+      .log-entry.post-tool-call {
+        border-left-color: #ff9800;
+      }
+
+      .log-entry.post-tool-call.error {
+        border-left-color: #f44336;
+        background: #ffebee;
+      }
+
+      .log-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        font-weight: bold;
+      }
+
+      .log-type {
+        color: #333;
+        font-size: 1.05em;
+      }
+
+      .timestamp {
+        color: #999;
+        font-size: 0.85em;
+        font-weight: normal;
+      }
+
+      .log-content {
+        margin-top: 8px;
+      }
+
+      .log-content pre {
+        background: #f5f5f5;
+        padding: 10px;
+        border-radius: 4px;
+        overflow-x: auto;
+        margin: 5px 0;
+        font-family: "Courier New", monospace;
+        font-size: 0.9em;
+        line-height: 1.4;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+
+      .tool-call {
+        margin-top: 10px;
+        padding: 10px;
+        background: #e8f5e9;
+        border-radius: 4px;
+        border-left: 3px solid #4caf50;
+      }
+
+      .tool-header {
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .tool-name {
+        color: #1976d2;
+        font-family: monospace;
+      }
+
+      .tool-args {
+        background: white;
+        padding: 8px;
+        border-radius: 3px;
+        font-size: 0.85em;
+        margin-top: 5px;
+      }
+
+      .tool-output {
+        background: #263238;
+        color: #aed581;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: 0.85em;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      details {
+        cursor: pointer;
+        margin-top: 5px;
+      }
+
+      details summary {
+        color: #1976d2;
+        font-size: 0.9em;
+        padding: 5px;
+        user-select: none;
+      }
+
+      details summary:hover {
+        background: #f0f0f0;
+        border-radius: 3px;
+      }
+
+      details[open] summary {
+        margin-bottom: 8px;
+      }
+
+      .error-message {
+        background: #ffebee;
+        color: #c62828;
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+        border-left: 4px solid #c62828;
+      }
+
+      /* Module list styles */
+      .modules-modal .modal-content {
+        max-width: 700px;
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+
+      .module-item {
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        background: #fafafa;
+      }
+
+      .module-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      .module-name {
+        font-weight: bold;
+        color: #2c3e50;
+        font-size: 1.1em;
+      }
+
+      .module-version {
+        color: #7f8c8d;
+        font-size: 0.9em;
+        margin-left: 10px;
+      }
+
+      .module-path {
+        font-size: 0.85em;
+        color: #7f8c8d;
+        margin: 5px 0;
+        word-break: break-all;
+      }
+
+      .module-description {
+        color: #555;
+        margin: 5px 0;
+      }
+
+      .publish-btn {
+        padding: 8px 16px;
+        background: #27ae60;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9em;
+      }
+
+      .publish-btn:hover {
+        background: #229954;
+      }
+
+      .publish-btn:disabled {
+        background: #95a5a6;
+        cursor: not-allowed;
+      }
+
+      .publish-status {
+        font-size: 0.85em;
+        margin-top: 5px;
+        padding: 5px;
+        border-radius: 3px;
+      }
+
+      .publish-status.success {
+        background: #d4edda;
+        color: #155724;
+      }
+
+      .publish-status.error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+
+      .publish-status.loading {
+        background: #d1ecf1;
+        color: #0c5460;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <div id="sidebar">
+      <h2>Tasks</h2>
+      <div id="taskList"></div>
+      <button id="createTaskBtn">+ Create Task</button>
+    </div>
+
+    <!-- Main Content -->
+    <div id="mainContent">
+      <div id="header">
+        <h1>MoonBit Task Platform</h1>
+        <div id="status">Status: Disconnected</div>
+      </div>
+
+      <div id="noTaskSelected">
+        Select a task from the sidebar or create a new one
+      </div>
+
+      <div id="taskView">
+        <div id="messages"></div>
+        <div id="inputArea">
+          <input
+            type="text"
+            id="messageInput"
+            placeholder="Enter your message..."
+          />
+          <button id="sendBtn">Send</button>
+          <button id="modulesBtn">Modules</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create Task Modal -->
+    <div id="createTaskModal" class="modal">
+      <div class="modal-content">
+        <h3>Create New Task</h3>
+        <div class="form-group">
+          <label for="taskName">Name (optional):</label>
+          <input type="text" id="taskName" placeholder="my-task" />
+        </div>
+        <div class="form-group">
+          <label for="taskModel">Model (optional):</label>
+          <select id="taskModel">
+            <option value="">Default</option>
+            <option value="anthropic/claude-sonnet-4.5">
+              anthropic/claude-sonnet-4.5
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="taskCwd">Working Directory (optional):</label>
+          <input
+            type="text"
+            id="taskCwd"
+            placeholder="Leave empty for temp directory"
+          />
+        </div>
+        <div class="form-group">
+          <label for="taskPrompt">Initial Prompt (optional):</label>
+          <textarea
+            id="taskPrompt"
+            placeholder="Enter an initial message for the task..."
+            rows="4"
+            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em; font-family: Arial, sans-serif; resize: vertical;"
+          ></textarea>
+        </div>
+        <div class="modal-buttons">
+          <button class="btn-secondary" id="cancelCreateBtn">Cancel</button>
+          <button class="btn-primary" id="confirmCreateBtn">Create</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modules Modal -->
+    <div id="modulesModal" class="modal modules-modal">
+      <div class="modal-content">
+        <h3>MoonBit Modules</h3>
+        <div id="modulesList"></div>
+        <div class="modal-buttons">
+          <button class="btn-secondary" id="closeModulesBtn">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/script.js"></script>
+  </body>
+</html>

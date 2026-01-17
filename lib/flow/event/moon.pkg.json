@@ -1,0 +1,8 @@
+{
+  "import": [
+    "moonbitlang/maria/openai",
+    "moonbitlang/async/aqueue",
+    "moonbitlang/maria/tool"
+  ],
+  "test-import": ["moonbitlang/async"]
+}

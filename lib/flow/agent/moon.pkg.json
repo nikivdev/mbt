@@ -1,0 +1,27 @@
+{
+  "import": [
+    "moonbitlang/maria/model",
+    "moonbitlang/maria/tool",
+    "moonbitlang/maria/openai",
+    "moonbitlang/maria/internal/token_counter",
+    "moonbitlang/maria/internal/cache",
+    "moonbitlang/maria/context",
+    "moonbitlang/maria/internal/conversation",
+    "moonbitlang/maria/internal/rand",
+    "moonbitlang/maria/internal/uuid",
+    "moonbitlang/async",
+    "moonbitlang/maria/internal/pino",
+    "moonbitlang/maria/event"
+  ],
+  "test-import": [
+    "moonbitlang/maria/internal/mock",
+    "moonbitlang/maria/internal/fsx",
+    "moonbitlang/maria/file",
+    "moonbitlang/maria/tools/replace_in_file",
+    "moonbitlang/maria/tools/read_file",
+    "moonbitlang/maria/tools/read_multiple_files",
+    "moonbitlang/maria/internal/path",
+    "moonbitlang/maria/internal/os"
+  ],
+  "wbtest-import": ["moonbitlang/maria/internal/mock"]
+}

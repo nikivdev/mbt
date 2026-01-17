@@ -1,0 +1,45 @@
+version = 1
+name = "mbt"
+
+[flow]
+primary_task = "deploy-flow"
+deploy_task = "deploy-flow"
+
+[storage]
+# Read env from ~/code/flow's storage
+provider = "myflow.sh"
+env_var = "FLOW_SECRETS_TOKEN"
+
+[[storage.envs]]
+name = "local"
+description = "Local development defaults"
+variables = [
+  { key = "ANTHROPIC_API_KEY", default = "" },
+  { key = "OPENAI_API_KEY", default = "" },
+]
+
+# Flow CLI tasks
+[[tasks]]
+name = "build-flow"
+command = "cd lib/flow && moon build --target native"
+description = "Build the flow CLI"
+shortcuts = ["b"]
+
+[[tasks]]
+name = "run-flow"
+command = "cd lib/flow && moon run cli --target native --"
+description = "Run flow CLI with args"
+shortcuts = ["r"]
+
+[[tasks]]
+name = "deploy-flow"
+command = "./scripts/deploy-flow.sh"
+description = "Build and install flow CLI to ~/bin"
+shortcuts = ["d", "deploy"]
+
+# Development tasks
+[[tasks]]
+name = "setup"
+command = "command -v moon >/dev/null || { echo 'Install moon: curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash'; exit 1; } && moon update && cd lib/flow && moon update && echo 'Setup complete'"
+description = "Check moon CLI and update dependencies"
+shortcuts = ["s"]

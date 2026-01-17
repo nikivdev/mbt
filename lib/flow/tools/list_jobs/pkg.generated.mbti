@@ -1,0 +1,19 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/maria/tools/list_jobs"
+
+import(
+  "moonbitlang/maria/job"
+  "moonbitlang/maria/tool"
+)
+
+// Values
+fn new(@job.Manager) -> @tool.Tool[String]
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+

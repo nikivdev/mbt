@@ -1,0 +1,39 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/maria/agent"
+
+import(
+  "moonbitlang/core/random"
+  "moonbitlang/maria/event"
+  "moonbitlang/maria/internal/pino"
+  "moonbitlang/maria/internal/uuid"
+  "moonbitlang/maria/model"
+  "moonbitlang/maria/openai"
+  "moonbitlang/maria/tool"
+)
+
+// Values
+async fn new(@model.Model, rand? : @random.Rand, uuid? : @uuid.Generator, logger? : @pino.Logger, cwd~ : StringView) -> Agent
+
+// Errors
+
+// Types and methods
+pub struct Agent {
+  rand : @random.Rand
+  uuid : @uuid.Generator
+  cwd : String
+  model : @model.Model
+  logger : @pino.Logger
+  // private fields
+}
+fn Agent::add_listener(Self, async (@event.Event) -> Unit) -> Unit
+async fn Agent::add_message(Self, @openai.ChatCompletionMessageParam) -> Unit
+async fn[Output : ToJson + Show] Agent::add_tool(Self, @tool.Tool[Output]) -> Unit
+async fn Agent::add_tools(Self, Array[@tool.AgentTool]) -> Unit
+fn Agent::close(Self) -> Unit
+async fn Agent::emit(Self, @event.Event) -> Unit
+async fn Agent::start(Self) -> Unit
+
+// Type aliases
+
+// Traits
+

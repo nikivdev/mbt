@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SSE Demo</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 900px;
+        margin: 50px auto;
+        background: #f5f5f5;
+      }
+      #messages {
+        border: 1px solid #ccc;
+        padding: 10px;
+        min-height: 400px;
+        max-height: 600px;
+        overflow-y: auto;
+        background: white;
+        border-radius: 5px;
+      }
+      .message {
+        padding: 5px;
+        margin: 5px 0;
+        background: #f0f0f0;
+        border-radius: 3px;
+      }
+      .time {
+        color: #666;
+        font-size: 0.9em;
+      }
+      button {
+        padding: 10px 20px;
+        margin: 10px 5px 10px 0;
+        cursor: pointer;
+      }
+
+      /* Pretty-printed log entry styles */
+      .log-entry {
+        margin: 15px 0;
+        border-left: 4px solid #ddd;
+        padding: 10px;
+        background: #fafafa;
+        border-radius: 4px;
+      }
+
+      .log-entry.model-loaded {
+        border-left-color: #4caf50;
+      }
+
+      .log-entry.message-added {
+        border-left-color: #2196f3;
+      }
+
+      .log-entry.request-completed {
+        border-left-color: #9c27b0;
+      }
+
+      .log-entry.post-tool-call {
+        border-left-color: #ff9800;
+      }
+
+      .log-entry.post-tool-call.error {
+        border-left-color: #f44336;
+        background: #ffebee;
+      }
+
+      .log-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        font-weight: bold;
+      }
+
+      .log-type {
+        color: #333;
+        font-size: 1.05em;
+      }
+
+      .timestamp {
+        color: #999;
+        font-size: 0.85em;
+        font-weight: normal;
+      }
+
+      .log-content {
+        margin-top: 8px;
+      }
+
+      .log-content pre {
+        background: #f5f5f5;
+        padding: 10px;
+        border-radius: 4px;
+        overflow-x: auto;
+        margin: 5px 0;
+        font-family: "Courier New", monospace;
+        font-size: 0.9em;
+        line-height: 1.4;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+
+      .tool-call {
+        margin-top: 10px;
+        padding: 10px;
+        background: #e8f5e9;
+        border-radius: 4px;
+        border-left: 3px solid #4caf50;
+      }
+
+      .tool-header {
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .tool-name {
+        color: #1976d2;
+        font-family: monospace;
+      }
+
+      .tool-args {
+        background: white;
+        padding: 8px;
+        border-radius: 3px;
+        font-size: 0.85em;
+        margin-top: 5px;
+      }
+
+      .tool-output {
+        background: #263238;
+        color: #aed581;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: 0.85em;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      details {
+        cursor: pointer;
+        margin-top: 5px;
+      }
+
+      details summary {
+        color: #1976d2;
+        font-size: 0.9em;
+        padding: 5px;
+        user-select: none;
+      }
+
+      details summary:hover {
+        background: #f0f0f0;
+        border-radius: 3px;
+      }
+
+      details[open] summary {
+        margin-bottom: 8px;
+      }
+
+      /* MoonBit Modules Section */
+      #modulesSection {
+        margin: 20px 0;
+        padding: 15px;
+        background: white;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+      }
+
+      .module-list {
+        margin-top: 10px;
+      }
+
+      .module-item {
+        padding: 12px;
+        margin: 8px 0;
+        background: #f9f9f9;
+        border-radius: 4px;
+        border-left: 4px solid #4caf50;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .module-info {
+        flex: 1;
+      }
+
+      .module-name {
+        font-weight: bold;
+        font-size: 1.1em;
+        color: #333;
+      }
+
+      .module-version {
+        color: #666;
+        font-size: 0.9em;
+        margin-left: 10px;
+      }
+
+      .module-description {
+        color: #777;
+        font-size: 0.9em;
+        margin-top: 4px;
+      }
+
+      .module-path {
+        color: #999;
+        font-size: 0.85em;
+        font-family: monospace;
+        margin-top: 2px;
+      }
+
+      .module-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .publish-btn {
+        padding: 8px 16px;
+        background: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9em;
+      }
+
+      .publish-btn:hover {
+        background: #45a049;
+      }
+
+      .publish-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+
+      .refresh-btn {
+        padding: 8px 16px;
+        background: #2196f3;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .refresh-btn:hover {
+        background: #1976d2;
+      }
+
+      .no-modules {
+        padding: 20px;
+        text-align: center;
+        color: #999;
+      }
+
+      .loading {
+        padding: 20px;
+        text-align: center;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Moonbit Agent Platform</h1>
+    <div id="status">Status: Disconnected</div>
+
+    <h2>MoonBit Modules:</h2>
+    <div id="modulesSection">
+      <button id="refreshModulesBtn" class="refresh-btn">
+        Refresh Modules
+      </button>
+      <div id="modulesList" class="module-list">
+        <div class="loading">Loading modules...</div>
+      </div>
+    </div>
+
+    <h2>Send Message:</h2>
+    <div>
+      <input
+        type="text"
+        id="messageInput"
+        placeholder="Enter your message..."
+        style="width: 70%; padding: 8px"
+      />
+      <button id="sendBtn" style="padding: 8px 20px">Send</button>
+    </div>
+
+    <h2>Events:</h2>
+    <div id="messages"></div>
+    <script src="/script.js"></script>
+  </body>
+</html>

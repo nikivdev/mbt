@@ -1,0 +1,10 @@
+{
+  "import": [
+    "moonbitlang/maria/internal/uuid",
+    "moonbitlang/maria/internal/rand",
+    { "path" : "moonbitlang/maria/internal/conversation", "alias": "conv"},
+    "moonbitlang/maria/internal/os",
+    "moonbitlang/maria/cmd/main/argument",
+    "moonbitlang/maria/internal/fsx"
+  ]
+}

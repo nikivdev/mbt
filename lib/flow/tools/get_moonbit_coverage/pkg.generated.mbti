@@ -1,0 +1,23 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/maria/tools/get_moonbit_coverage"
+
+import(
+  "moonbitlang/core/json"
+  "moonbitlang/maria/tool"
+)
+
+// Values
+fn new(String) -> @tool.Tool[CoverageResult]
+
+// Errors
+
+// Types and methods
+type CoverageResult
+impl Show for CoverageResult
+impl ToJson for CoverageResult
+impl @json.FromJson for CoverageResult
+
+// Type aliases
+
+// Traits
+

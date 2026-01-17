@@ -1,0 +1,12 @@
+{
+  "import": [
+    "moonbitlang/maria/openai",
+    "moonbitlang/maria/internal/token_counter",
+    "moonbitlang/maria/model",
+    "moonbitlang/maria/internal/pino"
+  ],
+  "test-import": [
+    "moonbitlang/maria/internal/mock",
+    "moonbitlang/async"
+  ]
+}

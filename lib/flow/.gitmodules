@@ -1,0 +1,3 @@
+[submodule "prompt/system-prompt"]
+	path = prompt/system-prompt
+	url = https://github.com/moonbitlang/system-prompt.git

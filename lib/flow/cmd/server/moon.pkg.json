@@ -1,0 +1,21 @@
+{
+  "is-main": true,
+  "import": [
+    "moonbitlang/async/http",
+    "moonbitlang/async",
+    "moonbitlang/async/socket",
+    "moonbitlang/async/io",
+    "moonbitlang/maria",
+    "moonbitlang/maria/internal/os",
+    "moonbitlang/maria/internal/pino",
+    "moonbitlang/async/aqueue",
+    "moonbitlang/maria/agent",
+    "moonbitlang/maria/openai",
+    "moonbitlang/maria/internal/fsx",
+    "moonbitlang/maria/internal/path",
+    "moonbitlang/async/os_error",
+    "moonbitlang/maria/internal/broadcast",
+    "moonbitlang/maria/internal/spawn",
+    "moonbitlang/maria/internal/moon"
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "import": [
+    "moonbitlang/maria/tool",
+    "moonbitlang/maria/internal/path",
+    "moonbitlang/maria/internal/fsx"
+  ],
+  "test-import" : ["moonbitlang/async", "moonbitlang/maria/internal/mock"]
+}

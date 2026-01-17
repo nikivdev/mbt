@@ -1,0 +1,25 @@
+{
+  "import": [
+    "moonbitlang/maria/agent",
+    "moonbitlang/maria/tools/execute_command",
+    "moonbitlang/maria/file",
+    "moonbitlang/maria/tools/list_files",
+    "moonbitlang/maria/tools/read_file",
+    "moonbitlang/maria/todo",
+    "moonbitlang/maria/internal/os",
+    "moonbitlang/maria/model",
+    "moonbitlang/maria/internal/pino",
+    "moonbitlang/maria/openai",
+    "moonbitlang/maria/tools/todo_read",
+    "moonbitlang/maria/tools/todo_write",
+    "moonbitlang/maria/tools/search_files",
+    "moonbitlang/maria/prompt",
+    "moonbitlang/maria/job",
+    "moonbitlang/maria/tool",
+    "moonbitlang/maria/tools/meta_write_to_file"
+  ],
+  "test-import": [
+    "moonbitlang/async",
+    "moonbitlang/maria/internal/mock"
+  ]
+}

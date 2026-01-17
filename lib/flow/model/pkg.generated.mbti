@@ -1,0 +1,65 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/maria/model"
+
+import(
+  "moonbitlang/core/json"
+  "moonbitlang/maria/internal/pino"
+)
+
+// Values
+fn open_router_model(api_key~ : String, name? : CommonModels) -> Model
+
+// Errors
+
+// Types and methods
+pub(all) enum CommonModels {
+  Qwen3CoderPlus
+  Qwen3CoderFlash
+  Grok4Fast
+  GrokCodeFast1
+  ClaudeHaiku4_5
+  ClaudeSonnet4_5
+  Gpt5Codex
+  Gpt5
+  Gpt5Mini
+  Gpt5Nano
+  KimiK2_0905
+  Glm4_6
+  MinimaxM2
+}
+impl Show for CommonModels
+
+type Loader
+async fn Loader::get_model(Self, name? : String, api_key? : String, base_url? : String) -> Model?
+fn Loader::models(Self) -> ArrayView[Model]
+async fn Loader::new(home~ : StringView, cwd~ : StringView, logger~ : @pino.Logger) -> Self
+
+pub struct Model {
+  name : String
+  description : String?
+  model_name : String
+  model_type : Type
+  api_key : String
+  base_url : String
+  safe_zone_tokens : Int
+  supports_anthropic_prompt_caching : Bool
+}
+#as_free_fn
+fn Model::new(api_key~ : String, base_url~ : String, name~ : String, safe_zone_tokens~ : Int, model_name? : String, model_type? : Type, description? : String, supports_anthropic_prompt_caching? : Bool) -> Self
+impl ToJson for Model
+impl @json.FromJson for Model
+
+pub(all) enum Provider {
+  OpenAI
+}
+
+pub(all) enum Type {
+  SaaS(Provider)
+}
+impl ToJson for Type
+impl @json.FromJson for Type
+
+// Type aliases
+
+// Traits
+

@@ -1,0 +1,26 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/maria/tools/todo_write"
+
+import(
+  "moonbitlang/core/json"
+  "moonbitlang/maria/todo"
+  "moonbitlang/maria/tool"
+)
+
+// Values
+fn new(@todo.Todo) -> @tool.Tool[TodoWriteResult]
+
+let prompt : String
+
+// Errors
+
+// Types and methods
+type TodoWriteResult
+impl Show for TodoWriteResult
+impl ToJson for TodoWriteResult
+impl @json.FromJson for TodoWriteResult
+
+// Type aliases
+
+// Traits
+

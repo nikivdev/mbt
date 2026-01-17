@@ -1,0 +1,24 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/maria/tools/read_file"
+
+import(
+  "moonbitlang/core/json"
+  "moonbitlang/maria/file"
+  "moonbitlang/maria/tool"
+)
+
+// Values
+fn new(@file.Manager) -> @tool.Tool[ReadFileToolResult]
+
+// Errors
+
+// Types and methods
+type ReadFileToolResult
+impl Show for ReadFileToolResult
+impl ToJson for ReadFileToolResult
+impl @json.FromJson for ReadFileToolResult
+
+// Type aliases
+
+// Traits
+

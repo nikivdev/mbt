@@ -1,0 +1,11 @@
+{
+  "import": [
+    "moonbitlang/maria/cmd/main/argument",
+    "moonbitlang/maria/internal/path",
+    "moonbitlang/maria/internal/fsx",
+    "moonbitlang/maria/internal/moon",
+    "moonbitlang/maria/internal/git",
+    "moonbitlang/maria",
+    "moonbitlang/maria/internal/os"
+  ]
+}

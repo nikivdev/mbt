@@ -1,0 +1,14 @@
+{
+  "is-main": true,
+  "import": [
+    {
+      "path": "moonbitlang/x/sys",
+      "alias": "sys"
+    }
+  ],
+  "warn-list": "-1",
+  "native-stub": [
+    "exit_stub.c"
+  ],
+  "support-targets": ["native"]
+}

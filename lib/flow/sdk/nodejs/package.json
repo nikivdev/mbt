@@ -1,0 +1,43 @@
+{
+  "name": "maria",
+  "version": "0.1.0",
+  "description": "Node.js bindings for the Maria agent executable.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "bin",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "maria",
+    "agent",
+    "ai",
+    "assistant"
+  ],
+  "author": "MoonBit",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/moonbitlang/maria.git",
+    "directory": "sdk/nodejs"
+  },
+  "homepage": "https://github.com/moonbitlang/maria",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "openai": "^4.73.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.7.2",
+    "typescript": "^5.7.3"
+  }
+}

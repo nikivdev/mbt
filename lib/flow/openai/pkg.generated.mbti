@@ -1,0 +1,367 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/maria/openai"
+
+import(
+  "moonbitlang/core/json"
+  "moonbitlang/maria/internal/pino"
+  "moonbitlang/maria/internal/schema"
+  "moonbitlang/maria/model"
+)
+
+// Values
+fn[T : ToChatCompletionMessageParamContent] assistant_message(content? : T, tool_calls? : Array[ChatCompletionMessageToolCall], name? : String) -> ChatCompletionMessageParam
+
+async fn chat(model~ : @model.Model, ChatCompletionParam, logger? : @pino.Logger) -> ChatCompletion
+
+fn chat_completion(model~ : String, messages~ : Array[ChatCompletionMessageParam], tools? : Array[ChatCompletionToolParam], usage? : CompletionUsageParam, user? : String, max_tokens? : Int, temperature? : Double, response_format? : ResponseFormat, stream? : Bool, stream_options? : ChatCompletionStreamOptionsParam, tool_choice? : ChatCompletionToolChoice) -> ChatCompletionParam
+
+fn chunk(id~ : String, choices~ : Array[ChatCompletionChunkChoice], created~ : Int, model~ : String, usage? : CompletionUsage, system_fingerprint? : String, service_tier? : ChatCompletionServiceTier, error? : OpenRouterErrorResponse) -> ChatCompletionChunk
+
+fn chunk_choice(index~ : Int, delta~ : ChatCompletionChunkChoiceDelta, finish_reason? : ChatCompletionChoiceFinishReason) -> ChatCompletionChunkChoice
+
+fn chunk_choice_delta(content? : String, refusal? : String, role? : ChatCompletionRole, tool_calls? : Array[ChatCompletionChunkChoiceDeltaToolCall]) -> ChatCompletionChunkChoiceDelta
+
+fn chunk_choice_delta_tool_call(index~ : Int, id? : String, function~ : ChatCompletionChunkChoiceDeltaToolCallFunction) -> ChatCompletionChunkChoiceDeltaToolCall
+
+fn chunk_choice_delta_tool_call_function(arguments? : String, name? : String) -> ChatCompletionChunkChoiceDeltaToolCallFunction
+
+async fn[T : Structural] data(model~ : @model.Model, prompt~ : String) -> T
+
+async fn json(model~ : @model.Model, prompt~ : String) -> Json
+
+fn json_schema(name~ : String, schema~ : Map[String, Json], description? : String, strict? : Bool) -> ResponseFormat
+
+fn stream_options(include_obfuscation? : Bool, include_usage? : Bool) -> ChatCompletionStreamOptionsParam
+
+fn[T : ToChatCompletionMessageParamContent] system_message(content~ : T, name? : String) -> ChatCompletionMessageParam
+
+async fn text(model~ : @model.Model, prompt~ : String) -> String
+
+fn text_content_part(String, cache_control? : CacheControl) -> ChatCompletionContentPartParam
+
+fn tool(name~ : String, description~ : String, parameters~ : Json, strict? : Bool) -> ChatCompletionToolParam
+
+fn tool_call(id~ : String, name~ : String, arguments~ : String) -> ChatCompletionMessageToolCall
+
+fn[T : ToChatCompletionMessageParamContent] tool_message(content~ : T, tool_call_id~ : String) -> ChatCompletionMessageParam
+
+fn usage(include_~ : Bool) -> CompletionUsageParam
+
+fn[T : ToChatCompletionMessageParamContent] user_message(content~ : T, name? : String) -> ChatCompletionMessageParam
+
+// Errors
+
+// Types and methods
+pub(all) enum CacheControl {
+  Ephemeral
+}
+impl ToJson for CacheControl
+
+pub struct ChatCompletion {
+  id : String
+  choices : Array[ChatCompletionChoice]
+  created : Int
+  model : String
+  usage : CompletionUsage?
+  system_fingerprint : String?
+  service_tier : ChatCompletionServiceTier?
+}
+impl Show for ChatCompletion
+impl ToJson for ChatCompletion
+impl @json.FromJson for ChatCompletion
+
+pub(all) struct ChatCompletionAllowedTools {
+  mode : ChatCompletionAllowedToolsMode
+  tools : Array[ChatCompletionToolChoice]
+}
+
+pub(all) enum ChatCompletionAllowedToolsMode {
+  Auto
+  Required
+}
+
+pub struct ChatCompletionAssistantMessageParam {
+  content : Array[ChatCompletionContentPartParam]
+  name : String?
+  tool_calls : Array[ChatCompletionMessageToolCall]
+}
+
+pub struct ChatCompletionChoice {
+  finish_reason : ChatCompletionChoiceFinishReason?
+  index : Int
+  message : ChatCompletionMessage
+  logprobs : ChatCompletionChoiceLogprobs?
+}
+impl Show for ChatCompletionChoice
+
+pub enum ChatCompletionChoiceFinishReason {
+  Stop
+  Length
+  ToolCalls
+  ContentFilter
+  FunctionCall
+}
+impl Show for ChatCompletionChoiceFinishReason
+
+pub struct ChatCompletionChoiceLogprobs {
+  content : Array[ChatCompletionTokenLogprob]?
+  refusal : Array[ChatCompletionTokenLogprob]?
+}
+impl Show for ChatCompletionChoiceLogprobs
+
+pub struct ChatCompletionChunk {
+  id : String
+  choices : Array[ChatCompletionChunkChoice]
+  created : Int
+  model : String
+  usage : CompletionUsage?
+  system_fingerprint : String?
+  service_tier : ChatCompletionServiceTier?
+  error : OpenRouterErrorResponse?
+}
+impl ToJson for ChatCompletionChunk
+impl @json.FromJson for ChatCompletionChunk
+
+pub struct ChatCompletionChunkChoice {
+  index : Int
+  delta : ChatCompletionChunkChoiceDelta
+  finish_reason : ChatCompletionChoiceFinishReason?
+}
+impl ToJson for ChatCompletionChunkChoice
+
+pub struct ChatCompletionChunkChoiceDelta {
+  content : String?
+  refusal : String?
+  role : ChatCompletionRole?
+  tool_calls : Array[ChatCompletionChunkChoiceDeltaToolCall]?
+}
+impl ToJson for ChatCompletionChunkChoiceDelta
+
+pub struct ChatCompletionChunkChoiceDeltaToolCall {
+  index : Int
+  id : String?
+  function : ChatCompletionChunkChoiceDeltaToolCallFunction
+}
+impl ToJson for ChatCompletionChunkChoiceDeltaToolCall
+
+pub struct ChatCompletionChunkChoiceDeltaToolCallFunction {
+  arguments : String?
+  name : String?
+}
+impl ToJson for ChatCompletionChunkChoiceDeltaToolCallFunction
+
+pub enum ChatCompletionContentPartParam {
+  Text(ChatCompletionContentPartTextParam)
+}
+impl ToJson for ChatCompletionContentPartParam
+impl ToChatCompletionMessageParamContent for ChatCompletionContentPartParam
+
+pub struct ChatCompletionContentPartTextParam {
+  text : String
+  cache_control : CacheControl?
+}
+
+pub(all) struct ChatCompletionCustomToolChoice {
+  name : String
+}
+
+pub(all) struct ChatCompletionFunctionToolChoice {
+  name : String
+}
+
+pub struct ChatCompletionMessage {
+  content : String?
+  refusal : String?
+  role : ChatCompletionMessageRole
+  tool_calls : Array[ChatCompletionMessageToolCall]
+}
+fn ChatCompletionMessage::to_param(Self) -> ChatCompletionMessageParam
+impl Show for ChatCompletionMessage
+impl ToJson for ChatCompletionMessage
+impl @json.FromJson for ChatCompletionMessage
+
+pub(all) enum ChatCompletionMessageParam {
+  System(ChatCompletionSystemMessageParam)
+  User(ChatCompletionUserMessageParam)
+  Assistant(ChatCompletionAssistantMessageParam)
+  Tool(ChatCompletionToolMessageParam)
+}
+impl ToJson for ChatCompletionMessageParam
+impl @json.FromJson for ChatCompletionMessageParam
+
+pub enum ChatCompletionMessageRole {
+  Assistant
+}
+impl Show for ChatCompletionMessageRole
+impl ToJson for ChatCompletionMessageRole
+
+pub struct ChatCompletionMessageToolCall {
+  id : String
+  function : ChatCompletionMessageToolCallFunction
+}
+impl Show for ChatCompletionMessageToolCall
+impl ToJson for ChatCompletionMessageToolCall
+
+pub struct ChatCompletionMessageToolCallFunction {
+  arguments : String?
+  name : String
+}
+impl Show for ChatCompletionMessageToolCallFunction
+
+pub struct ChatCompletionParam {
+  model : String
+  messages : Array[ChatCompletionMessageParam]
+  tools : Array[ChatCompletionToolParam]
+  usage : CompletionUsageParam?
+  user : String?
+  max_tokens : Int?
+  temperature : Double?
+  response_format : ResponseFormat?
+  stream : Bool?
+  stream_options : ChatCompletionStreamOptionsParam?
+  tool_choice : ChatCompletionToolChoice?
+}
+impl ToJson for ChatCompletionParam
+
+pub enum ChatCompletionRole {
+  Developer
+  System
+  User
+  Assistant
+  Tool
+}
+impl ToJson for ChatCompletionRole
+
+pub(all) enum ChatCompletionServiceTier {
+  Auto
+  Default
+  Flex
+  Scale
+  Priority
+}
+impl Show for ChatCompletionServiceTier
+
+pub struct ChatCompletionStreamOptionsParam {
+  include_obfuscation : Bool?
+  include_usage : Bool?
+}
+impl ToJson for ChatCompletionStreamOptionsParam
+
+pub struct ChatCompletionSystemMessageParam {
+  content : Array[ChatCompletionContentPartParam]
+  name : String?
+}
+
+pub struct ChatCompletionTokenLogprob {
+  token : String
+  logprob : Double
+  bytes : Array[Int]?
+  top_logprobs : Array[ChatCompletionTopLogprob]
+}
+impl Show for ChatCompletionTokenLogprob
+
+pub(all) enum ChatCompletionToolChoice {
+  Disallow
+  Auto
+  Required
+  AllowedTools(ChatCompletionAllowedTools)
+  Function(ChatCompletionFunctionToolChoice)
+  Custom(ChatCompletionCustomToolChoice)
+}
+
+pub struct ChatCompletionToolMessageParam {
+  content : Array[ChatCompletionContentPartParam]
+  tool_call_id : String
+}
+
+pub enum ChatCompletionToolParam {
+  Function(FunctionDefinition)
+}
+impl ToJson for ChatCompletionToolParam
+
+pub struct ChatCompletionTopLogprob {
+  token : String
+  logprob : Double
+  bytes : Array[Int]?
+}
+impl Show for ChatCompletionTopLogprob
+
+pub struct ChatCompletionUserMessageParam {
+  content : Array[ChatCompletionContentPartParam]
+  name : String?
+}
+
+pub struct CompletionTokensDetails {
+  reasoning_tokens : Int?
+}
+impl Show for CompletionTokensDetails
+impl ToJson for CompletionTokensDetails
+
+pub struct CompletionUsage {
+  completion_tokens : Int
+  completion_tokens_details : CompletionTokensDetails?
+  cost : Double?
+  cost_details : CostDetails?
+  prompt_tokens : Int
+  prompt_tokens_details : PromptTokensDetails?
+  total_tokens : Int
+}
+impl Show for CompletionUsage
+impl ToJson for CompletionUsage
+impl @json.FromJson for CompletionUsage
+
+pub struct CompletionUsageParam {
+  include_ : Bool
+}
+
+pub struct CostDetails {
+  upstream_inference_cost : Double?
+}
+impl Show for CostDetails
+impl ToJson for CostDetails
+
+pub struct FunctionDefinition {
+  name : String
+  description : String
+  parameters : Json
+  strict : Bool?
+}
+
+type JsonSchema
+
+pub struct OpenRouterErrorResponse {
+  code : Int
+  message : String
+  metadata : Json
+}
+impl ToJson for OpenRouterErrorResponse
+impl @json.FromJson for OpenRouterErrorResponse
+
+pub struct PromptTokensDetails {
+  cached_tokens : Int?
+  audio_tokens : Int?
+}
+impl Show for PromptTokensDetails
+impl ToJson for PromptTokensDetails
+
+pub(all) enum ResponseFormat {
+  Text
+  JsonSchema(JsonSchema)
+  JsonObject
+}
+impl ToJson for ResponseFormat
+
+// Type aliases
+
+// Traits
+pub(open) trait Structural : @json.FromJson {
+  name() -> String
+  description() -> String
+  schema() -> @schema.Schema
+}
+
+trait ToChatCompletionMessageParamContent
+impl ToChatCompletionMessageParamContent for String
+impl[T : ToChatCompletionMessageParamContent] ToChatCompletionMessageParamContent for Array[T]
+impl ToChatCompletionMessageParamContent for StringView
+

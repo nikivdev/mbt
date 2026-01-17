@@ -1,0 +1,16 @@
+{
+  "is-main": true,
+  "import": [
+    "moonbitlang/async",
+    "moonbitlang/async/io",
+    "moonbitlang/async/stdio",
+    "moonbitlang/maria",
+    "moonbitlang/maria/agent",
+    "moonbitlang/maria/openai",
+    "moonbitlang/maria/internal/backtrace",
+    "moonbitlang/maria/tool",
+    "moonbitlang/maria/internal/os",
+    "moonbitlang/maria/event"
+  ],
+  "overrides": ["moonbitlang/maria/internal/abort"]
+}

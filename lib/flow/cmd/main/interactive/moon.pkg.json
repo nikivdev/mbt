@@ -1,0 +1,12 @@
+{
+  "import": [
+    "moonbitlang/async",
+    "moonbitlang/maria/internal/readline",
+    "moonbitlang/async/stdio",
+    "moonbitlang/maria",
+    "moonbitlang/maria/agent",
+    "moonbitlang/maria/openai",
+    "moonbitlang/maria/cmd/main/argument",
+    "moonbitlang/maria/event"
+  ]
+}

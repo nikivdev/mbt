@@ -1,0 +1,8 @@
+{
+  "import": [
+    "moonbitlang/maria/internal/path",
+    "moonbitlang/maria/internal/fsx",
+    "moonbitlang/maria/internal/uuid",
+    "moonbitlang/maria/clock"
+  ]
+}

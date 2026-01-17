@@ -1,0 +1,16 @@
+{
+  "name": "moonbitlang/maria",
+  "version": "0.1.0",
+  "deps": {
+    "moonbitlang/x": "0.4.38",
+    "moonbitlang/async": "0.16.1",
+    "moonbitlang/regexp": "0.3.4",
+    "myfreess/charclass": "0.1.3"
+  },
+  "readme": "README.md",
+  "repository": "",
+  "license": "Apache-2.0",
+  "keywords": [],
+  "description": "",
+  "preferred-target": "native"
+}

@@ -1,0 +1,76 @@
+# Copyright 2025 International Digital Economy Academy
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: "Install MoonBit"
+description: "Install MoonBit CLI for the specified channel"
+inputs:
+  channel:
+    description: "MoonBit channel to install (latest, pre-release, nightly)"
+    required: true
+    default: "latest"
+runs:
+  using: "composite"
+  steps:
+    - name: Install MoonBit (Linux)
+      if: runner.os == 'Linux'
+      shell: bash
+      env:
+        CHANNEL: ${{ inputs.channel }}
+      run: |
+        curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s "$CHANNEL"
+        echo "${HOME}/.moon/bin" >> $GITHUB_PATH
+
+    - name: Install MoonBit (macOS)
+      if: runner.os == 'macOS'
+      shell: bash
+      env:
+        CHANNEL: ${{ inputs.channel }}
+      run: |
+        curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s "$CHANNEL"
+        echo "${HOME}/.moon/bin" >> $GITHUB_PATH
+
+    - name: Install MoonBit (Windows)
+      if: runner.os == 'Windows'
+      shell: powershell
+      env:
+        MOONBIT_INSTALL_VERSION: ${{ inputs.channel || '' }}
+      run: |
+        Set-ExecutionPolicy RemoteSigned -Scope CurrentUser; irm https://cli.moonbitlang.com/install/powershell.ps1 | iex
+        "C:\Users\runneradmin\.moon\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
+
+    - name: Bundle LLVM (Linux)
+      if: runner.os == 'Linux' && inputs.channel == 'nightly'
+      shell: bash
+      run: |
+        cd ${HOME}/.moon/lib/core
+        moon bundle --target llvm
+
+    - name: Bundle LLVM (Windows)
+      if: runner.os == 'Windows' && inputs.channel == 'nightly'
+      shell: powershell
+      working-directory: "C:\\Users\\runneradmin\\.moon\\lib\\core"
+      run: |
+        moon bundle --target llvm
+
+    - name: Bundle LLVM (macOS)
+      if: runner.os == 'macOS' && inputs.channel == 'nightly'
+      shell: bash
+      run: |
+        cd ${HOME}/.moon/lib/core
+        moon bundle --target llvm
+
+    - name: Update mooncakes.io index (Unix)
+      shell: bash
+      run: |
+        moon update

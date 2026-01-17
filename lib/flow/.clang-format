@@ -1,0 +1,5 @@
+ContinuationIndentWidth: 2
+AlwaysBreakAfterReturnType: All
+BinPackParameters: false
+AlignAfterOpenBracket: BlockIndent
+AllowAllParametersOfDeclarationOnNextLine: false

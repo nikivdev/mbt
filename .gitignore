@@ -1,0 +1,45 @@
+# core
+.DS_Store
+.env
+.env*.local
+.env.production
+output
+dist
+target
+.idea
+.cache
+.output
+node_modules
+package-lock.json
+yarn.lock
+.vercel
+*.db
+.repo_ignore
+i.*
+i-*
+i/
+internal/
+past.*
+past-*
+past/
+*.log
+private
+.blade
+.npm-cache
+
+.mooncakes/
+.moonagent/
+*log.jsonl
+.ai/internal/
+
+# flow
+.ai/internal/
+.ai/web/
+.claude/
+.codex/
+.flox/
+
+_build/
+
+# Private
+hive/

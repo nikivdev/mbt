@@ -1,0 +1,18 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/maria/tools/get_moonbit_mbti"
+
+import(
+  "moonbitlang/maria/tool"
+)
+
+// Values
+fn new(String) -> @tool.Tool[String]
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+

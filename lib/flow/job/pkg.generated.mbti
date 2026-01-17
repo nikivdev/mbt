@@ -1,0 +1,51 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/maria/job"
+
+import(
+  "moonbitlang/core/json"
+)
+
+// Values
+
+// Errors
+pub suberror InvalidJobId Id
+
+// Types and methods
+pub(all) struct Id(Int)
+#deprecated
+fn Id::inner(Self) -> Int
+impl Eq for Id
+impl Hash for Id
+impl Show for Id
+impl ToJson for Id
+impl @json.FromJson for Id
+
+pub struct Job {
+  id : Id
+  name : String
+  description : String?
+  command : String
+  cwd : String
+  stdout : String
+  stderr : String
+  // private fields
+}
+fn Job::status(Self) -> Int?
+async fn Job::wait(Self) -> Int
+impl ToJson for Job
+
+pub struct Manager {
+  cwd : String
+  // private fields
+}
+fn Manager::get(Self, Id) -> Job?
+async fn Manager::list(Self) -> Array[Job]
+fn Manager::new(cwd~ : String) -> Self
+async fn Manager::spawn(Self, name~ : String, description? : String, command~ : String, cwd? : String) -> Job
+async fn Manager::start(Self) -> Unit
+async fn Manager::wait(Self, Id) -> Int
+
+// Type aliases
+
+// Traits
+

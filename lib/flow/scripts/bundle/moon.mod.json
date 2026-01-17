@@ -1,0 +1,10 @@
+{
+  "name": "moonbitlang/maria/scripts/bundle",
+  "deps": {
+    "tonyfettes/uv": "0.12.8",
+    "moonbitlang/async": {
+      "path": "../../async"
+    }
+  },
+  "preferred-target": "native"
+}

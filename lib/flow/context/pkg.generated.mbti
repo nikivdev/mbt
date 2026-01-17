@@ -1,0 +1,30 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/maria/context"
+
+import(
+  "moonbitlang/core/json"
+  "moonbitlang/maria/internal/pino"
+  "moonbitlang/maria/model"
+  "moonbitlang/maria/openai"
+)
+
+// Values
+
+// Errors
+
+// Types and methods
+type Extractor
+async fn Extractor::extract_code_snippets(Self, String, history~ : Array[@openai.ChatCompletionMessageParam]) -> String?
+fn Extractor::new(model~ : @model.Model, safe_zone_tokens~ : Int, window_size? : Int, overlap? : Int, logger~ : @pino.Logger) -> Self raise
+
+type Pruner
+fn Pruner::new(safe_zone_tokens~ : Int, logger~ : @pino.Logger) -> Self raise
+async fn Pruner::prune_messages(Self, Array[@openai.ChatCompletionMessageParam], tools? : Array[@openai.ChatCompletionToolParam]) -> Unit
+
+type Range
+impl @json.FromJson for Range
+
+// Type aliases
+
+// Traits
+

@@ -1,0 +1,24 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/maria/tools/list_files"
+
+import(
+  "moonbitlang/core/json"
+  "moonbitlang/maria/file"
+  "moonbitlang/maria/tool"
+)
+
+// Values
+fn new(@file.Manager) -> @tool.Tool[ListFilesResult]
+
+// Errors
+
+// Types and methods
+type ListFilesResult
+impl Show for ListFilesResult
+impl ToJson for ListFilesResult
+impl @json.FromJson for ListFilesResult
+
+// Type aliases
+
+// Traits
+

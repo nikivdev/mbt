@@ -1,0 +1,19 @@
+{
+  "import": [
+    "moonbitlang/maria/file",
+    "moonbitlang/maria/tool",
+    "moonbitlang/maria/internal/fsx",
+    "moonbitlang/maria/internal/path",
+    "moonbitlang/maria/internal/fuzzy"
+  ],
+  "test-import": [
+    "moonbitlang/async",
+    "moonbitlang/maria/tools/read_file",
+    "moonbitlang/maria/internal/mock",
+    "moonbitlang/maria/agent",
+    "moonbitlang/maria/model",
+    "moonbitlang/maria/openai",
+    "moonbitlang/maria/internal/pino",
+    "moonbitlang/maria/event"
+  ]
+}

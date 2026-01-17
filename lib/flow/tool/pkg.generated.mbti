@@ -1,0 +1,54 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/maria/tool"
+
+// Values
+
+// Errors
+
+// Types and methods
+type AgentTool
+async fn AgentTool::call(Self, Json) -> ToolResult[(Json, String)] noraise
+fn AgentTool::desc(Self) -> ToolDesc
+
+pub(all) struct JsonSchema(Json)
+fn JsonSchema::from_json(Json) -> Self
+#deprecated
+fn JsonSchema::inner(Self) -> Json
+impl ToJson for JsonSchema
+
+pub struct Tool[Output] {
+  desc : ToolDesc
+  // private fields
+}
+#as_free_fn
+async fn[Output] Tool::call(Self[Output], Json) -> ToolResult[Output] noraise
+#as_free_fn
+fn[Output] Tool::new(description~ : String, name~ : String, schema~ : JsonSchema, ToolFn[Output]) -> Self[Output]
+fn[Output : ToJson + Show] Tool::to_agent_tool(Self[Output]) -> AgentTool
+
+pub struct ToolDesc {
+  description : String
+  name : String
+  schema : JsonSchema
+}
+impl ToJson for ToolDesc
+
+pub(all) struct ToolFn[Output](async (Json) -> ToolResult[Output] noraise)
+#deprecated
+fn[Output] ToolFn::inner(Self[Output]) -> async (Json) -> ToolResult[Output] noraise
+
+pub enum ToolResult[Output] {
+  Ok(Output)
+  Error(Error, String)
+}
+#as_free_fn
+fn[Output] ToolResult::error(String, error? : Error) -> Self[Output]
+#as_free_fn
+fn[Output] ToolResult::ok(Output) -> Self[Output]
+impl[Output : Show] Show for ToolResult[Output]
+impl[Output : ToJson] ToJson for ToolResult[Output]
+
+// Type aliases
+
+// Traits
+

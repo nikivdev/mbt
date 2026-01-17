@@ -1,0 +1,36 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/maria/event"
+
+import(
+  "moonbitlang/maria/openai"
+  "moonbitlang/maria/tool"
+)
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) enum Event {
+  PreConversation
+  PostConversation
+  MessageAdded(@openai.ChatCompletionMessageParam)
+  ToolAdded(@tool.ToolDesc)
+  PreToolCall(@openai.ChatCompletionMessageToolCall)
+  PostToolCall(@openai.ChatCompletionMessageToolCall, result~ : Result[Json, Error], rendered~ : String)
+  TokenCounted(Int)
+  ContextPruned(origin_token_count~ : Int, pruned_token_count~ : Int)
+  RequestCompleted(usage~ : @openai.CompletionUsage?, message~ : @openai.ChatCompletionMessage)
+}
+impl ToJson for Event
+
+type EventTarget
+fn EventTarget::add_listener(Self, async (Event) -> Unit) -> Unit
+fn EventTarget::emit(Self, Event) -> Unit
+fn EventTarget::new() -> Self
+async fn EventTarget::start(Self) -> Unit
+
+// Type aliases
+
+// Traits
+

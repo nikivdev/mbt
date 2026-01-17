@@ -1,0 +1,16 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/maria/cmd/main/argument"
+
+// Values
+
+// Errors
+pub(all) suberror InvalidArgument String
+impl Show for InvalidArgument
+impl ToJson for InvalidArgument
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+

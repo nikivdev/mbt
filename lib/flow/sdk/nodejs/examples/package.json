@@ -1,0 +1,10 @@
+{
+  "type": "module",
+  "dependencies": {
+    "maria": "file:..",
+    "tsx": "^4.19.2"
+  },
+  "scripts": {
+    "start": "tsx main.ts"
+  }
+}

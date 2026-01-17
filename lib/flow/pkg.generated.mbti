@@ -1,0 +1,27 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/maria"
+
+import(
+  "moonbitlang/maria/agent"
+  "moonbitlang/maria/internal/pino"
+)
+
+// Values
+
+// Errors
+pub suberror ModelNotConfigured
+
+// Types and methods
+pub struct Maria {
+  logger : @pino.Logger
+  agent : @agent.Agent
+}
+fn Maria::close(Self) -> Unit
+#as_free_fn
+async fn Maria::new(logger? : @pino.Logger, model? : String, cwd? : String) -> Self
+async fn Maria::start(Self, String) -> Unit
+
+// Type aliases
+
+// Traits
+

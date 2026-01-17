@@ -1,0 +1,138 @@
+# Copyright 2025 International Digital Economy Academy
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: new-moon
+
+on:
+  # https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#workflow_dispatch
+  workflow_dispatch:
+
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env: 
+      NEW_MOON: 1
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install MoonBit
+        uses: ./.github/actions/install-moonbit
+        with:
+          channel: latest
+
+      - name: Inspect MoonBit version
+        run: |
+          moon version --all
+
+      - name: Check MoonBit code
+        run: |
+          moon check --deny-warn
+
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    continue-on-error: true
+
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      NEW_MOON: 1
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install MoonBit
+        uses: ./.github/actions/install-moonbit
+        with:
+          channel: latest
+
+      - name: Inspect MoonBit version
+        run: |
+          moon version --all
+
+      - name: Setup Git
+        run: |
+          git config --global user.name "maria-ci"
+          git config --global user.email "maria-ci@example.com"
+
+      - name: Run tests
+        run: |
+          moon test -v
+
+  info:
+    runs-on: ubuntu-latest
+
+    env: 
+      NEW_MOON: 1
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install MoonBit
+        uses: ./.github/actions/install-moonbit
+        with:
+          channel: latest
+
+      - name: Inspect MoonBit version
+        run: |
+          moon version --all
+
+      - name: Generate `pkg.generated.mbti`
+        run: |
+          moon install
+          moon info
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "Error: 'pkg.generated.mbti' is not up to date. Please run 'moon info' locally and commit the changes."
+            git diff
+            exit 1
+          else
+            echo "'pkg.generated.mbti' is up to date."
+          fi
+
+  fmt:
+    runs-on: ubuntu-latest
+        
+    env: 
+      NEW_MOON: 1
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install MoonBit
+        uses: ./.github/actions/install-moonbit
+        with:
+          channel: latest
+
+      - name: Inspect MoonBit version
+        run: |
+          moon version --all
+
+      - name: Check code format
+        run: |
+          moon install
+          moon fmt
+          git diff --exit-code

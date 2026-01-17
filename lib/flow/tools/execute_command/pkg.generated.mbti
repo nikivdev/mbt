@@ -1,0 +1,36 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/maria/tools/execute_command"
+
+import(
+  "moonbitlang/core/json"
+  "moonbitlang/maria/job"
+  "moonbitlang/maria/tool"
+)
+
+// Values
+fn new(@job.Manager) -> @tool.Tool[CommandResult]
+
+// Errors
+
+// Types and methods
+pub struct CommandOutput {
+  text : String
+  truncated_lines : Int
+  original_lines : Int
+}
+impl ToJson for CommandOutput
+impl @json.FromJson for CommandOutput
+
+pub enum CommandResult {
+  Completed(command~ : String, status~ : Int, stdout~ : String, stderr~ : String, max_output_lines~ : Int)
+  TimedOut(command~ : String, timeout~ : Int, stdout~ : String, stderr~ : String, max_output_lines~ : Int)
+  Background(command~ : String, job_id~ : @job.Id)
+}
+impl Show for CommandResult
+impl ToJson for CommandResult
+impl @json.FromJson for CommandResult
+
+// Type aliases
+
+// Traits
+

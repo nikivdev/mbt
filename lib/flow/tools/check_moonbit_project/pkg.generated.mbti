@@ -1,0 +1,28 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/maria/tools/check_moonbit_project"
+
+import(
+  "moonbitlang/maria/internal/diagnostics"
+  "moonbitlang/maria/tool"
+)
+
+// Values
+fn input_json(diagnostic_limit? : Int, patch_code? : String, patch_file_name? : String, project_path~ : String) -> Json
+
+fn new(String) -> @tool.Tool[CheckMoonbitProjectResult]
+
+// Errors
+
+// Types and methods
+pub struct CheckMoonbitProjectResult {
+  diagnostics : @diagnostics.Diagnostics
+  diagnostic_limit : Int
+  rendered_diagnostics : String
+}
+impl Show for CheckMoonbitProjectResult
+impl ToJson for CheckMoonbitProjectResult
+
+// Type aliases
+
+// Traits
+
