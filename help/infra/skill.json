@@ -1,0 +1,13 @@
+{
+  "name": "infra",
+  "help_cmd": "infra-help help",
+  "keywords": [
+    "infra",
+    "infra-help",
+    "infra-deploy",
+    "host deploy",
+    "deploy host",
+    "server deploy"
+  ],
+  "install_hint": "f deploy-help"
+}
