@@ -1,0 +1,24 @@
+version = 1
+name = "ctx"
+
+[flow]
+primary_task = "deploy"
+deploy_task = "deploy"
+
+[[tasks]]
+name = "build"
+command = "moon build --target native"
+description = "Build ctx CLI"
+shortcuts = ["b"]
+
+[[tasks]]
+name = "deploy"
+command = "./scripts/deploy.sh"
+description = "Build and install ctx to ~/bin"
+shortcuts = ["d"]
+
+[[tasks]]
+name = "run"
+command = "moon run cli --target native --"
+description = "Run ctx with args"
+shortcuts = ["r"]

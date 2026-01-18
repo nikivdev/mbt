@@ -1,0 +1,9 @@
+{
+  "name": "nikidev/ctx",
+  "version": "0.1.0",
+  "deps": {
+    "moonbitlang/x": "0.4.38"
+  },
+  "warn-list": "-2-6-7-8-10-12-17-20-50-52",
+  "alert-list": "-all"
+}

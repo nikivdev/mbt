@@ -43,3 +43,6 @@ _build/
 
 # Private
 hive/
+.ai-worktrees/
+
+.ai/todos/*.bike
