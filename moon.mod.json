@@ -2,7 +2,8 @@
   "name": "nikivdev/moonbit",
   "version": "0.1.0",
   "deps": {
-    "moonbitlang/x": "0.4.38"
+    "moonbitlang/x": "0.4.38",
+    "moonbitlang/async": "0.16.1"
   },
   "readme": "readme.md",
   "repository": "nikivdev/moonbit",
