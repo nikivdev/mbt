@@ -1,11 +1,11 @@
 ///|
-/// env-help - Flow env helper CLI
+/// env-help - Flow env helper CLI (global-only)
 ///
 /// Usage:
 ///   env-help help
-///   env-help save <service> <values...>
-///   env-help save --env <name> --personal <service> <values...>
-///   env-help list [--env <name>] [--personal]
+///   env-help save [service] <values...>
+///   env-help save --env <name> [service] <values...>
+///   env-help list [--env <name>]
 ///
 /// Examples:
 ///   env-help save aws Access Key ID: AKIA... Secret Access Key: ... Region: eu-central-1
@@ -42,15 +42,16 @@ async fn main raise {
 }
 
 fn print_usage() -> Unit {
-  println("\{program_name} - store env vars locally via Flow")
+  println("\{program_name} - store global env vars locally via Flow")
   println("")
   println("Usage:")
-  println("  env-help save <service> <values...>")
-  println("  env-help save --env <name> --personal <service> <values...>")
-  println("  env-help list [--env <name>] [--personal]")
+  println("  env-help save [service] <values...>")
+  println("  env-help save --env <name> [service] <values...>")
+  println("  env-help list [--env <name>]")
   println("")
   println("Notes:")
   println("  - Uses FLOW_ENV_BACKEND=local")
+  println("  - Stores in global (personal) scope only")
   println("  - Values are never printed")
   println("")
   println("Examples:")
@@ -86,13 +87,7 @@ async fn save_command(args : Array[String], start : Int) -> Unit raise {
   }
 
   for item in items {
-    let result = run_flow_set(
-      parsed.root,
-      parsed.env_name,
-      parsed.personal,
-      item.key,
-      item.value,
-    )
+    let result = run_flow_set(item.key, item.value)
     if result.exit_code == 0 {
       println("set \{item.key} (\{mask_value(item.value)})")
     } else {
@@ -107,7 +102,7 @@ async fn save_command(args : Array[String], start : Int) -> Unit raise {
 async fn list_command(args : Array[String], start : Int) -> Unit raise {
   let cwd = get_cwd()
   let parsed = parse_env_args(args, start, cwd)
-  let result = run_flow_list(parsed.root, parsed.env_name, parsed.personal)
+  let result = run_flow_list(parsed.env_name)
   if result.stdout.length() > 0 {
     println(result.stdout.trim())
   }
@@ -119,34 +114,23 @@ async fn list_command(args : Array[String], start : Int) -> Unit raise {
 struct EnvArgs {
   service : String
   payload : String
-  root : String
   env_name : String
-  personal : Bool
 }
 
 fn parse_env_args(args : Array[String], start : Int, default_root : String) -> EnvArgs {
   let mut service = ""
   let mut payload = ""
-  let mut root = default_root
   let mut env_name = "production"
-  let mut personal = false
 
   let parts : Array[String] = []
   let mut i = start
   while i < args.length() {
     let arg = args[i]
-    if arg == "--root" || arg == "-r" {
-      i += 1
-      if i < args.length() {
-        root = args[i]
-      }
-    } else if arg == "--env" || arg == "-e" {
+    if arg == "--env" || arg == "-e" {
       i += 1
       if i < args.length() {
         env_name = args[i]
       }
-    } else if arg == "--personal" {
-      personal = true
     } else if service.length() == 0 {
       service = arg
     } else {
@@ -159,7 +143,12 @@ fn parse_env_args(args : Array[String], start : Int, default_root : String) -> E
     payload = parts.join(" ")
   }
 
-  EnvArgs::{ service, payload, root: normalize_root(root, default_root), env_name, personal }
+  let _ = default_root
+  if service.length() > 0 && payload.length() == 0 && service.contains("=") {
+    payload = service
+    service = "generic"
+  }
+  EnvArgs::{ service, payload, env_name }
 }
 
 struct EnvItem {
@@ -240,17 +229,23 @@ fn parse_label_pairs(text : String, labels : Array[(String, String)]) -> Array[E
 
 fn parse_key_value_pairs(text : String) -> Array[EnvItem] {
   let items : Array[EnvItem] = []
-  for part_view in text.split(" ") {
-    let part = trim_whitespace(part_view.to_string())
-    if part.length() == 0 {
+  for line_view in text.split("\n") {
+    let line = trim_whitespace(line_view.to_string())
+    if line.length() == 0 {
       continue
     }
-    let eq = index_of(part, "=")
-    if eq > 0 && eq < part.length() - 1 {
-      let key = substring(part, 0, eq)
-      let value = substring(part, eq + 1, part.length())
-      if key.length() > 0 && value.length() > 0 {
-        items.push(EnvItem::{ key, value })
+    for part_view in line.split(" ") {
+      let part = trim_whitespace(part_view.to_string())
+      if part.length() == 0 {
+        continue
+      }
+      let eq = index_of(part, "=")
+      if eq > 0 && eq < part.length() - 1 {
+        let key = substring(part, 0, eq)
+        let value = substring(part, eq + 1, part.length())
+        if key.length() > 0 && value.length() > 0 {
+          items.push(EnvItem::{ key, value })
+        }
       }
     }
   }
@@ -288,44 +283,29 @@ fn sort_hits(hits : Array[(Int, Int, String)]) -> Array[(Int, Int, String)] {
   sorted
 }
 
-async fn run_flow_set(
-  root : String,
-  env_name : String,
-  personal : Bool,
-  key : String,
-  value : String,
-) -> CmdResult raise {
+async fn run_flow_set(key : String, value : String) -> CmdResult raise {
   let args : Array[String] = []
   args.push("env")
   args.push("set")
-  if personal {
-    args.push("--personal")
-  }
-  if env_name.length() > 0 {
-    args.push("-e")
-    args.push(env_name)
-  }
   args.push("\{key}=\{value}")
-  run_flow_cmd(root, args)
+  run_flow_cmd(args)
 }
 
-async fn run_flow_list(root : String, env_name : String, personal : Bool) -> CmdResult raise {
+async fn run_flow_list(env_name : String) -> CmdResult raise {
   let args : Array[String] = []
   args.push("env")
   args.push("list")
-  if personal {
-    args.push("--personal")
-  }
   if env_name.length() > 0 {
     args.push("-e")
     args.push(env_name)
   }
-  run_flow_cmd(root, args)
+  run_flow_cmd(args)
 }
 
-async fn run_flow_cmd(root : String, args : Array[String]) -> CmdResult raise {
+async fn run_flow_cmd(args : Array[String]) -> CmdResult raise {
   let command = "FLOW_ENV_BACKEND=local f"
-  run_exec(command, args, root)
+  let cwd = get_cwd()
+  run_exec(command, args, cwd)
 }
 
 fn mask_value(value : String) -> String {
@@ -382,58 +362,10 @@ fn get_cwd() -> String {
   }
 }
 
-fn normalize_root(root : String, cwd : String) -> String {
-  let expanded = expand_path(root)
-  let absolute = if expanded.has_prefix("/") {
-    expanded
-  } else {
-    join_paths(cwd, expanded)
-  }
-  strip_trailing_slash(absolute)
-}
-
-fn expand_path(path : String) -> String {
-  if path.has_prefix("~") {
-    match @sys.get_env_var("HOME") {
-      Some(home) => home + string_from(path, 1)
-      None => path
-    }
-  } else {
-    path
-  }
-}
-
-fn join_paths(base : String, part : String) -> String {
-  if base.has_suffix("/") {
-    base + part
-  } else {
-    base + "/" + part
-  }
-}
-
-fn strip_trailing_slash(path : String) -> String {
-  if path.length() > 1 && path.has_suffix("/") {
-    substring(path, 0, path.length() - 1)
-  } else {
-    path
-  }
-}
-
 fn trim_whitespace(s : String) -> String {
   s.trim(chars=" \n\t\r").to_string()
 }
 
-fn string_from(s : String, start : Int) -> String {
-  let result : Array[Char] = []
-  let mut i = 0
-  for c in s {
-    if i >= start {
-      result.push(c)
-    }
-    i += 1
-  }
-  String::from_array(result)
-}
 
 fn substring(s : String, start : Int, end : Int) -> String {
   let result : Array[Char] = []
