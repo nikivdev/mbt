@@ -44,6 +44,18 @@ description = "Build and install zed-help CLI to ~/bin"
 shortcuts = ["zh", "zed-help"]
 
 [[tasks]]
+name = "deploy-zed-open"
+command = "./scripts/deploy-zed-open.sh"
+description = "Build and install zed-open CLI to ~/bin"
+shortcuts = ["zo", "zed-open"]
+
+[[tasks]]
+name = "deploy-fishy"
+command = "./scripts/deploy-fishy.sh"
+description = "Build and install fishy CLI to ~/bin"
+shortcuts = ["fy", "fishy"]
+
+[[tasks]]
 name = "deploy-help"
 command = "./scripts/deploy-help.sh"
 description = "Build and install changed help/* CLIs to ~/bin"
