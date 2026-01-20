@@ -56,6 +56,18 @@ description = "Build and install fishy CLI to ~/bin"
 shortcuts = ["fy", "fishy"]
 
 [[tasks]]
+name = "deploy-comet-help"
+command = "./scripts/deploy-comet.sh"
+description = "Build and install comet-help CLI to ~/bin"
+shortcuts = ["ch", "comet-help"]
+
+[[tasks]]
+name = "lmstudio-test"
+command = "moon run cli/lmstudio-test --target native -- fishy-tests"
+description = "Run LM Studio local fishy inference tests"
+shortcuts = ["lm", "lmtest"]
+
+[[tasks]]
 name = "deploy-help"
 command = "./scripts/deploy-help.sh"
 description = "Build and install changed help/* CLIs to ~/bin"

@@ -3,7 +3,6 @@
   "import": [
     "moonbitlang/x/sys",
     "moonbitlang/async",
-    "moonbitlang/async/process",
     "moonbitlang/async/http",
     "moonbitlang/async/io",
     "moonbitlang/core/json"
