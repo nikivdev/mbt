@@ -35,6 +35,10 @@ async fn main {
     println("\{program_name} \{program_version}")
     return
   }
+  if first == "reload" {
+    println("Run: source /Users/nikiv/config/fish/fn.fish")
+    return
+  }
   if first.has_prefix("-") {
     print_usage()
     return
@@ -98,7 +102,7 @@ fn parse_wrap(tokens : Array[String]) -> ParsedWrap? {
   let mut i = start
   while i < tokens.length() {
     let tok = tokens[i]
-    if tok == "for" || tok == "as" || tok == "named" || tok == "to" {
+    if tok == "for" || tok == "as" || tok == "named" || tok == "to" || tok == "with" {
       marker_idx = i
       break
     }
@@ -167,36 +171,10 @@ fn build_update_script(info : ParsedWrap, desc : String) -> String {
     "path.write_text(content)\n" +
     "print(f\"Wrote {wrap} to {path}\")\n" +
     "PY\n" +
-    "WRAP=\"fishy\" " +
-    "CMD=\"fishy\" " +
-    "WRAPS=\"fishy\" " +
-    "DESC=\"fishy - fish wrapper helper\" " +
-    "python - <<'PY'\n" +
-    "import os, re, pathlib\n" +
-    "wrap = os.environ.get('WRAP', 'fishy')\n" +
-    "cmd = os.environ.get('CMD', 'fishy')\n" +
-    "wraps_cmd = os.environ.get('WRAPS', 'fishy')\n" +
-    "desc = os.environ.get('DESC', 'fishy - fish wrapper helper')\n" +
-    "path = pathlib.Path('" + target_file + "')\n" +
-    "content = path.read_text() if path.exists() else ''\n" +
-    "pattern = re.compile(r'^function ' + re.escape(wrap) + r' .*?^end\\\\n', re.M | re.S)\n" +
-    "content = pattern.sub('', content)\n" +
-    "func = f\"\"\"function {wrap} --wraps={wraps_cmd} --description \\\"{desc}\\\"\\n\"\"\"\n" +
-    "func += f\"    command {cmd} $argv\\n\"\n" +
-    "func += f\"    and source " + target_file + "\\n\"\n" +
-    "func += \"end\\n\"\n" +
-    "func += f\"complete -c {wrap} -w {wraps_cmd}\\n\"\n" +
-    "if content and not content.endswith('\\\\n'):\n" +
-    "    content += '\\\\n'\n" +
-    "content += func\n" +
-    "path.parent.mkdir(parents=True, exist_ok=True)\n" +
-    "path.write_text(content)\n" +
-    "PY\n" +
     "if test -f /Users/nikiv/.config/fish/functions/" + info.wrapper + ".fish; then " +
     "rm -f /Users/nikiv/.config/fish/functions/" + info.wrapper + ".fish; " +
     "echo 'Removed /Users/nikiv/.config/fish/functions/" + info.wrapper + ".fish'; " +
-    "fi\n" +
-    "echo 'Run: source " + target_file + "'\n"
+    "fi\n"
   script
 }
 
