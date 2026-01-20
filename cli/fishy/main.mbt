@@ -272,6 +272,7 @@ async fn infer_action(prompt : String) -> FishyAction? raise {
   let (model_name, port) = resolve_model_port()
   let system_prompt =
     "You convert fish shell requests into JSON. Output ONLY JSON. " +
+    "No markdown, no backticks, no extra text, no explanations. " +
     "Schema: {\"action\":\"wrap|set|function|unknown\", " +
     "\"name\":\"\", \"command\":\"\", \"args\":[], " +
     "\"flags\":\"\", \"var\":\"\", \"values\":[], " +
@@ -541,21 +542,24 @@ fn extract_json_object(text : String) -> Json? {
       }
     None => ()
   }
-  let start = index_of_char(trimmed, '{')
-  let end = last_index_of_char(trimmed, '}')
-  if start >= 0 && end > start {
-    let slice = substring(trimmed, start, end + 1)
+  let objects = collect_json_objects(trimmed)
+  let mut i = objects.length() - 1
+  while i >= 0 {
+    let slice = objects[i]
     match try_parse_json(slice) {
       Some(json) =>
         match json {
-          Object(_) => Some(json)
-          _ => None
+          Object(_) => return Some(json)
+          _ => ()
         }
-      None => None
+      None => ()
     }
-  } else {
-    None
+    if i == 0 {
+      break
+    }
+    i -= 1
   }
+  None
 }
 
 fn try_parse_json(text : String) -> Json? {
@@ -634,4 +638,29 @@ fn substring(text : String, start : Int, end : Int) -> String {
     i += 1
   }
   buf.to_string()
+}
+
+fn collect_json_objects(text : String) -> Array[String] {
+  let out : Array[String] = []
+  let mut depth = 0
+  let mut start = -1
+  let mut i = 0
+  for c in text {
+    if c == '{' {
+      if depth == 0 {
+        start = i
+      }
+      depth += 1
+    } else if c == '}' {
+      if depth > 0 {
+        depth -= 1
+        if depth == 0 && start >= 0 {
+          out.push(substring(text, start, i + 1))
+          start = -1
+        }
+      }
+    }
+    i += 1
+  }
+  out
 }
