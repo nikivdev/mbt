@@ -1,6 +1,32 @@
 version = 1
 name = "mbt"
 
+# Global keybindings for this project
+[[keybindings]]
+keys = "ctrl-alt-b"
+task = "build-flow"
+description = "Build flow CLI"
+
+[[keybindings]]
+keys = "ctrl-alt-t"
+task = "test"
+description = "Run tests"
+
+[[keybindings]]
+keys = "ctrl-alt-c"
+task = "clean-scan"
+description = "Scan for cruft"
+
+[[keybindings]]
+keys = "ctrl-alt-d"
+task = "deploy-flow"
+description = "Deploy flow"
+
+[[keybindings]]
+keys = "ctrl-alt-s"
+task = "shell-install"
+description = "Install shell wrappers"
+
 [flow]
 primary_task = "deploy-flow"
 deploy_task = "deploy-flow"
@@ -68,10 +94,28 @@ description = "Run LM Studio local fishy inference tests"
 shortcuts = ["lm", "lmtest"]
 
 [[tasks]]
+name = "lmstudio-env-test"
+command = "moon run cli/lmstudio-test --target native -- env-tests"
+description = "Run LM Studio local env-agent inference tests"
+shortcuts = ["lme", "lm-env"]
+
+[[tasks]]
+name = "lmstudio-env-agent-test"
+command = "moon run cli/lmstudio-test --target native -- env-agent-tests"
+description = "Run LM Studio local env agent command-output tests"
+shortcuts = ["lmea", "lm-env-agent"]
+
+[[tasks]]
 name = "deploy-help"
 command = "./scripts/deploy-help.sh"
 description = "Build and install changed help/* CLIs to ~/bin"
 shortcuts = ["dh", "help"]
+
+[[tasks]]
+name = "effect-watch"
+command = "./scripts/watch-effect.sh"
+description = "Watch effect library and re-run tests on change"
+shortcuts = ["ew", "effect-w"]
 
 # Development tasks
 [[tasks]]
@@ -79,3 +123,127 @@ name = "setup"
 command = "command -v moon >/dev/null || { echo 'Install moon: curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash'; exit 1; } && moon update && cd lib/flow && moon update && echo 'Setup complete'"
 description = "Check moon CLI and update dependencies"
 shortcuts = ["s"]
+
+# Clean CLI tasks
+[[tasks]]
+name = "build-clean"
+command = "moon build cli/clean --target native"
+description = "Build the clean CLI for detecting repo cruft"
+shortcuts = ["bc"]
+
+[[tasks]]
+name = "deploy-clean"
+command = "./scripts/deploy-clean.sh"
+description = "Build and install clean CLI to ~/bin"
+shortcuts = ["dc", "clean-deploy"]
+
+[[tasks]]
+name = "clean-scan"
+command = "moon run cli/clean --target native --"
+description = "Scan current directory for cruft (dry run)"
+shortcuts = ["cs", "scan"]
+
+[[tasks]]
+name = "clean-verbose"
+command = "moon run cli/clean --target native -- -v"
+description = "Scan with verbose output showing reasons"
+shortcuts = ["cv"]
+
+[[tasks]]
+name = "clean-delete"
+command = "moon run cli/clean --target native -- --delete"
+description = "Actually delete detected cruft (use with caution)"
+shortcuts = ["cd", "clean-rm"]
+
+[[tasks]]
+name = "clean-large"
+command = "moon run cli/clean --target native -- --min-size 1M"
+description = "Scan for cruft larger than 1MB"
+shortcuts = ["cl", "clean-1m"]
+
+[[tasks]]
+name = "clean-rise"
+command = "moon run cli/clean --target native -- ~/code/rise"
+description = "Scan ~/code/rise for cruft"
+shortcuts = ["cr"]
+
+[[tasks]]
+name = "clean-here"
+command = "_build/native/release/build/cli/clean/clean.exe ."
+description = "Run clean on current directory (requires build first)"
+shortcuts = ["c"]
+
+# Keymap tasks
+[[tasks]]
+name = "keymap-generate"
+command = "moon run cli/keymap --target native -- generate"
+description = "Generate fish keybindings from config"
+shortcuts = ["kg", "keygen"]
+
+[[tasks]]
+name = "keymap-list"
+command = "moon run cli/keymap --target native -- list"
+description = "List all keybindings"
+shortcuts = ["kl", "keylist"]
+
+[[tasks]]
+name = "keymap-install"
+command = "moon run cli/keymap --target native -- install"
+description = "Install keybindings to fish config"
+shortcuts = ["ki", "keyinstall"]
+
+# Shell command registry tasks
+[[tasks]]
+name = "shell-generate"
+command = "moon run cli/shell --target native -- generate"
+description = "Generate fish wrappers for traced commands"
+shortcuts = ["sg", "shell-gen"]
+
+[[tasks]]
+name = "shell-list"
+command = "moon run cli/shell --target native -- list"
+description = "List all registered shell commands"
+shortcuts = ["sl", "shell-ls"]
+
+[[tasks]]
+name = "shell-install"
+command = "moon run cli/shell --target native -- install"
+description = "Install shell wrappers to fish config"
+shortcuts = ["si", "shell-inst"]
+
+[[tasks]]
+name = "shell-context"
+command = "moon run cli/shell --target native -- context"
+description = "Show AI context JSON for debugging"
+shortcuts = ["sc", "shell-ctx"]
+
+[[tasks]]
+name = "shell-traces"
+command = "moon run cli/shell --target native -- trace"
+description = "Show recent command traces"
+shortcuts = ["st", "traces"]
+
+[[tasks]]
+name = "deploy-shell"
+command = "./scripts/deploy-shell.sh"
+description = "Build and install shell CLI to ~/bin"
+shortcuts = ["ds", "shell-deploy"]
+
+# fishx - Enhanced fish shell
+[[tasks]]
+name = "deploy-fishx"
+command = "./scripts/deploy-fishx.sh"
+description = "Build and install fishx CLI to ~/bin"
+shortcuts = ["fx", "fishx"]
+
+[[tasks]]
+name = "fishx-install"
+command = "moon run cli/fishx --target native -- install"
+description = "Install fishx wrappers and keymaps"
+shortcuts = ["fxi"]
+
+[[tasks]]
+name = "fishx-status"
+command = "moon run cli/fishx --target native -- status"
+description = "Show fishx setup status"
+shortcuts = ["fxs"]

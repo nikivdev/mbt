@@ -4,6 +4,8 @@
 /// Usage:
 ///   lmstudio-test prompt <text...>
 ///   lmstudio-test fishy-tests
+///   lmstudio-test env-tests
+///   lmstudio-test env-agent-tests
 ///   lmstudio-test -h | --help
 
 let default_model = "zai-org/glm-4.7-flash"
@@ -43,6 +45,14 @@ async fn main {
     run_fishy_tests()
     return
   }
+  if cmd == "env-tests" {
+    run_env_tests()
+    return
+  }
+  if cmd == "env-agent-tests" {
+    run_env_agent_tests()
+    return
+  }
 
   print_usage()
 }
@@ -53,10 +63,13 @@ fn print_usage() -> Unit {
   println("Usage:")
   println("  lmstudio-test prompt <text...>")
   println("  lmstudio-test fishy-tests")
+  println("  lmstudio-test env-tests")
+  println("  lmstudio-test env-agent-tests")
   println("")
   println("Env overrides:")
   println("  LM_STUDIO_MODEL (default: \{default_model})")
   println("  LM_STUDIO_PORT  (default: 1234)")
+  println("  LM_STUDIO_ALLOW_COT=1 (allow reasoning text)")
 }
 
 fn join_args(args : Array[String], start : Int) -> String {
@@ -172,14 +185,7 @@ async fn run_fishy_tests() -> Unit raise {
     },
   ]
 
-  let system_prompt =
-    "You convert fish shell requests into JSON. Output ONLY JSON. " +
-    "No markdown, no backticks, no extra text, no explanations. " +
-    "Schema: {\"action\":\"wrap|set|function|unknown\", " +
-    "\"name\":\"\", \"command\":\"\", \"args\":[], " +
-    "\"flags\":\"\", \"var\":\"\", \"values\":[], " +
-    "\"body\":\"\", \"description\":\"\"}. " +
-    "Use empty strings or empty arrays when a field is not needed."
+  let system_prompt = build_fishy_system_prompt()
 
   let (model, port) = resolve_model_port(None, None)
   println("Model: \{model}  Port: \{port}")
@@ -208,6 +214,214 @@ async fn run_fishy_tests() -> Unit raise {
         println("  raw: \{response}")
       }
     }
+  }
+}
+
+struct EnvTestCase {
+  name : String
+  prompt : String
+  expect_keys : Array[String]
+}
+
+async fn run_env_tests() -> Unit raise {
+  let tests : Array[EnvTestCase] = [
+    EnvTestCase::{
+      name: "aws",
+      prompt: "env aws Access Key ID: test-access-key-id-123 Secret Access Key test-secret-access-key-456 Region: eu-central-1",
+      expect_keys: ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_REGION"],
+    },
+    EnvTestCase::{
+      name: "stream",
+      prompt: "env STREAM_SERVER_HETZNER_HOST=u533855.your-storagebox.de STREAM_SERVER_HETZNER_USER=u533855 STREAM_SERVER_HETZNER_PATH=/backups/streams STREAM_SERVER_HETZNER_PORT=23",
+      expect_keys: [
+        "STREAM_SERVER_HETZNER_HOST",
+        "STREAM_SERVER_HETZNER_USER",
+        "STREAM_SERVER_HETZNER_PATH",
+        "STREAM_SERVER_HETZNER_PORT",
+      ],
+    },
+  ]
+
+  let system_prompt = build_env_system_prompt()
+
+  let (model, port) = resolve_model_port(None, None)
+  println("Model: \{model}  Port: \{port}")
+
+  for case_ in tests {
+    let response = prompt_local_model(model, port, system_prompt, case_.prompt)
+    let parsed = extract_json_object(response)
+    match parsed {
+      None => {
+        println("[FAIL] \{case_.name}: could not parse JSON")
+        println("  raw: \{response}")
+      }
+      Some(json) => {
+        let keys = extract_env_keys(json)
+        let missing = missing_keys(case_.expect_keys, keys)
+        let missing_str = missing.join(", ")
+        if missing.length() == 0 {
+          println("[PASS] \{case_.name}")
+        } else {
+          println("[FAIL] \{case_.name}: missing \{missing_str}")
+        }
+        println("  raw: \{response}")
+      }
+    }
+  }
+}
+
+struct EnvAgentTestCase {
+  name : String
+  prompt : String
+}
+
+async fn run_env_agent_tests() -> Unit raise {
+  let tests : Array[EnvAgentTestCase] = [
+    EnvAgentTestCase::{
+      name: "aws",
+      prompt: "env aws Access Key ID: test-access-key-id-123 Secret Access Key test-secret-access-key-456 Region: eu-central-1",
+    },
+    EnvAgentTestCase::{
+      name: "stream",
+      prompt: "env STREAM_SERVER_HETZNER_HOST=u533855.your-storagebox.de STREAM_SERVER_HETZNER_USER=u533855 STREAM_SERVER_HETZNER_PATH=/backups/streams STREAM_SERVER_HETZNER_PORT=23",
+    },
+  ]
+
+  let system_prompt =
+    "Use Flow env store to save env vars. Output a single bash command only. " +
+    "Prefer: FLOW_ENV_BACKEND=local env-help save [--env <name>] [service] <raw text>. " +
+    "If user already provides KEY=VALUE pairs, pass them through as-is. " +
+    "If user mentions an env name, include --env <name>. " +
+    "Do not echo secrets or add extra text."
+
+  let (model, port) = resolve_model_port(None, None)
+  println("Model: \{model}  Port: \{port}")
+
+  for case_ in tests {
+    let response = prompt_local_model(model, port, system_prompt, case_.prompt)
+    let line = last_non_empty_line(response)
+    let ok = contains_any(line, ["env-help save", "hive env", "f env set"])
+    if ok {
+      println("[PASS] \{case_.name}: \{line}")
+    } else {
+      println("[FAIL] \{case_.name}: \{line}")
+    }
+  }
+}
+
+fn extract_env_keys(json : Json) -> Array[String] {
+  let out : Array[String] = []
+  match json {
+    Object(obj) => {
+      match obj.get("items") {
+        Some(Array(items)) => {
+          for item in items {
+            match item {
+              Object(entry) => {
+                match entry.get("key") {
+                  Some(String(value)) => out.push(value)
+                  _ => ()
+                }
+              }
+              _ => ()
+            }
+          }
+        }
+        _ => ()
+      }
+    }
+    _ => ()
+  }
+  out
+}
+
+fn missing_keys(expected : Array[String], got : Array[String]) -> Array[String] {
+  let out : Array[String] = []
+  for key in expected {
+    let mut found = false
+    for got_key in got {
+      if got_key == key {
+        found = true
+        break
+      }
+    }
+    if !found {
+      out.push(key)
+    }
+  }
+  out
+}
+
+fn contains_any(text : String, needles : Array[String]) -> Bool {
+  for needle in needles {
+    if text.contains(needle) {
+      return true
+    }
+  }
+  false
+}
+
+fn last_non_empty_line(text : String) -> String {
+  let lines : Array[String] = []
+  for line_view in text.split("\n") {
+    let line = trim_whitespace(line_view.to_string())
+    if line.length() > 0 {
+      lines.push(line)
+    }
+  }
+  if lines.length() == 0 {
+    ""
+  } else {
+    lines[lines.length() - 1]
+  }
+}
+
+fn env_true(name : String) -> Bool {
+  match @sys.get_env_var(name) {
+    Some(value) => {
+      let lower = value.to_lower()
+      lower == "1" || lower == "true" || lower == "yes" || lower == "on"
+    }
+    None => false
+  }
+}
+
+fn allow_cot() -> Bool {
+  env_true("LM_STUDIO_ALLOW_COT")
+}
+
+fn build_fishy_system_prompt() -> String {
+  let schema =
+    "Schema: {\"action\":\"wrap|set|function|unknown\", " +
+    "\"name\":\"\", \"command\":\"\", \"args\":[], " +
+    "\"flags\":\"\", \"var\":\"\", \"values\":[], " +
+    "\"body\":\"\", \"description\":\"\"}. " +
+    "Use empty strings or empty arrays when a field is not needed."
+  if allow_cot() {
+    "You convert fish shell requests into JSON. " +
+    "You may include reasoning, but you MUST include a final JSON object. " +
+    "The last JSON object in your response will be parsed. " +
+    schema
+  } else {
+    "You convert fish shell requests into JSON. Output ONLY JSON. " +
+    "No markdown, no backticks, no extra text, no explanations. " +
+    schema
+  }
+}
+
+fn build_env_system_prompt() -> String {
+  let schema =
+    "Schema: {\"action\":\"env\",\"env\":\"\",\"items\":[{\"key\":\"\",\"value\":\"\"}]}. " +
+    "Use empty env when not specified."
+  if allow_cot() {
+    "You extract env vars from user text. " +
+    "You may include reasoning, but you MUST include a final JSON object. " +
+    "The last JSON object in your response will be parsed. " +
+    schema
+  } else {
+    "You extract env vars from user text. Output ONLY JSON. " +
+    "No markdown, no backticks, no extra text. " +
+    schema
   }
 }
 

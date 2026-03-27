@@ -1,0 +1,488 @@
+///|
+/// fishx - Enhanced fish shell launcher with full tracing and AI context
+///
+/// This CLI:
+/// 1. Installs shell wrappers (tracing, error handling)
+/// 2. Installs keymaps (hive agent bindings)
+/// 3. Configures the environment for AI tools
+///
+/// To switch to enhanced fish: exec ~/.local/bin/fish
+
+async fn main raise {
+  let args = @sys.get_cli_args()
+
+  if args.length() <= 1 {
+    // Default: install and show how to launch
+    quick_setup()
+    return
+  }
+
+  let command = args[1]
+
+  match command {
+    "install" | "i" => install_all()
+    "status" | "s" => show_status()
+    "wrappers" | "w" => install_wrappers_only()
+    "keymaps" | "k" => install_keymaps_only()
+    "context" | "c" => show_context()
+    "shell" => print_shell_command()
+    "--help" | "-h" | "help" => print_help()
+    _ => {
+      println("Unknown command: " + command)
+      print_help()
+    }
+  }
+}
+
+fn print_help() -> Unit {
+  println("fishx - Enhanced fish shell with tracing and AI context")
+  println("")
+  println("USAGE:")
+  println("  fishx              Quick setup (install + show launch command)")
+  println("  fishx <command>")
+  println("")
+  println("COMMANDS:")
+  println("  (none)      Install and show how to launch")
+  println("  install     Install wrappers, keymaps, and config")
+  println("  status      Show current setup status")
+  println("  wrappers    Install shell wrappers only")
+  println("  keymaps     Install keymaps only")
+  println("  context     Show AI context JSON")
+  println("  shell       Print the launch command")
+  println("  help        Show this help")
+  println("")
+  println("WORKFLOW:")
+  println("  1. Run: fishx")
+  println("  2. Then: exec ~/.local/bin/fish")
+  println("")
+  println("Or add to your shell config:")
+  println("  if test -x ~/.local/bin/fish")
+  println("      exec ~/.local/bin/fish")
+  println("  end")
+  println("")
+  println("FEATURES:")
+  println("  - Automatic command tracing (timing, exit codes)")
+  println("  - Error pattern detection with suggestions")
+  println("  - AI context for Claude/Codex integration")
+  println("  - Custom keybindings for hive agents")
+}
+
+fn quick_setup() -> Unit {
+  let home = get_home()
+  let wrappers_file = home + "/.config/fish/conf.d/flow-shell-wrappers.fish"
+  let keymaps_file = home + "/.config/fish/conf.d/flow-keymaps.fish"
+
+  // Check if already installed
+  if @fs.path_exists(wrappers_file) && @fs.path_exists(keymaps_file) {
+    println("fishx is already installed!")
+    println("")
+    println("Launch enhanced fish:")
+    println("  exec ~/.local/bin/fish")
+    return
+  }
+
+  // Install
+  println("Setting up fishx...")
+  println("")
+  install_all()
+
+  println("")
+  println("Setup complete! Launch enhanced fish:")
+  println("")
+  println("  exec ~/.local/bin/fish")
+  println("")
+  println("Or add to ~/.config/fish/config.fish for auto-switch:")
+  println("")
+  println("  if status is-login; and test -x ~/.local/bin/fish")
+  println("      exec ~/.local/bin/fish")
+  println("  end")
+}
+
+fn install_all() -> Unit {
+  println("Installing fishx enhancements...")
+  println("")
+
+  install_wrappers_only()
+  println("")
+  install_keymaps_only()
+  println("")
+  install_init_script()
+}
+
+fn install_wrappers_only() -> Unit {
+  let home = get_home()
+  let config_dir = home + "/.config/fish/conf.d"
+  let output_path = config_dir + "/flow-shell-wrappers.fish"
+
+  ensure_dir(config_dir)
+
+  let config = @shell.default_shell_config()
+  let script = config.to_fish_script()
+
+  try {
+    @fs.write_string_to_file(output_path, script)
+    println("Installed shell wrappers: " + output_path)
+    println("  " + config.commands.length().to_string() + " commands wrapped with tracing")
+  } catch {
+    error => println("Error: " + error.to_string())
+  }
+}
+
+fn install_keymaps_only() -> Unit {
+  let home = get_home()
+  let config_dir = home + "/.config/fish/conf.d"
+  let output_path = config_dir + "/flow-keymaps.fish"
+
+  ensure_dir(config_dir)
+
+  let config = @keymap.KeymapConfig::with_keymaps(
+    [@keymap.default_keymap(), @keymap.vi_keymap()],
+    "default-enhanced",
+  )
+  let script = config.to_fish_script()
+
+  try {
+    @fs.write_string_to_file(output_path, script)
+    let default_km = @keymap.default_keymap()
+    println("Installed keymaps: " + output_path)
+    println("  " + default_km.bindings.length().to_string() + " keybindings")
+  } catch {
+    error => println("Error: " + error.to_string())
+  }
+}
+
+fn install_init_script() -> Unit {
+  let home = get_home()
+  let config_dir = home + "/.config/fish/conf.d"
+  let output_path = config_dir + "/flow-init.fish"
+
+  ensure_dir(config_dir)
+
+  let script = generate_init_script()
+
+  try {
+    @fs.write_string_to_file(output_path, script)
+    println("Installed init script: " + output_path)
+  } catch {
+    error => println("Error: " + error.to_string())
+  }
+}
+
+fn generate_init_script() -> String {
+  let lines : Array[String] = []
+
+  lines.push("# flow-init.fish - Initialize flow shell environment")
+  lines.push("# Generated by fishx - do not edit manually")
+  lines.push("")
+  lines.push("# Environment variables")
+  lines.push("set -gx FLOW_SHELL 1")
+  lines.push("set -gx __SHELL_TRACE_DIR /tmp/shell-traces")
+  lines.push("set -gx __SHELL_CONTEXT_FILE /tmp/shell-context.json")
+  lines.push("set -gx __SHELL_AI_CONTEXT 1")
+  lines.push("")
+  lines.push("# Ensure trace directory exists")
+  lines.push("mkdir -p $__SHELL_TRACE_DIR")
+  lines.push("")
+  lines.push("# Quick status")
+  lines.push("abbr -a fxs 'fishx status'")
+  lines.push("abbr -a fxc 'fishx context'")
+  lines.push("")
+  lines.push("# AI context helper")
+  lines.push("function ai-context -d 'Get AI context JSON'")
+  lines.push("    fishx context")
+  lines.push("end")
+  lines.push("")
+  lines.push("# Recent errors helper")
+  lines.push("function recent-errors -d 'Show recent command errors'")
+  lines.push("    if test -f $__SHELL_TRACE_DIR/traces.jsonl")
+  lines.push("        grep '\"exit\":' $__SHELL_TRACE_DIR/traces.jsonl | grep -v '\"exit\":0' | tail -10")
+  lines.push("    else")
+  lines.push("        echo 'No traces yet'")
+  lines.push("    end")
+  lines.push("end")
+  lines.push("")
+  lines.push("# Clear traces")
+  lines.push("function clear-traces -d 'Clear command traces'")
+  lines.push("    rm -rf $__SHELL_TRACE_DIR/*")
+  lines.push("    echo 'Traces cleared'")
+  lines.push("end")
+  lines.push("")
+  lines.push("# fx - Quick switch to enhanced fish (for use from other shells)")
+  lines.push("function fx -d 'Switch to enhanced fish'")
+  lines.push("    if not test -f ~/.config/fish/conf.d/flow-shell-wrappers.fish")
+  lines.push("        fishx install")
+  lines.push("    end")
+  lines.push("    exec ~/.local/bin/fish")
+  lines.push("end")
+  lines.push("")
+
+  lines.join("\n")
+}
+
+async fn show_status() -> Unit raise {
+  let home = get_home()
+  let fish_bin = home + "/.local/bin/fish"
+  let config_dir = home + "/.config/fish/conf.d"
+  let wrappers_file = config_dir + "/flow-shell-wrappers.fish"
+  let keymaps_file = config_dir + "/flow-keymaps.fish"
+  let init_file = config_dir + "/flow-init.fish"
+  let trace_dir = "/tmp/shell-traces"
+  let data_dir = get_data_dir()
+  let observe_dir = data_dir + "/fish/observe"
+  let io_trace_dir = data_dir + "/fish/io-trace"
+  let last_meta = io_trace_dir + "/last.meta"
+
+  println("FISHX STATUS")
+  println("=" |> repeat(50))
+  println("")
+
+  // Session
+  println("Session:")
+  let shell_env = get_env_or("SHELL", "unknown")
+  let term_env = get_env_or("TERM", "unknown")
+  let ppid_env = get_env_or("PPID", "")
+  let ppid = if ppid_env.length() > 0 {
+    ppid_env
+  } else {
+    trim_whitespace(run_shell_output("ps -p $$ -o ppid="))
+  }
+  let parent_shell = if ppid.length() > 0 {
+    trim_whitespace(run_shell_output("ps -p " + ppid + " -o comm="))
+  } else {
+    "unknown"
+  }
+  println("  parent: " + parent_shell)
+  println("  SHELL:  " + shell_env)
+  println("  TERM:   " + term_env)
+  println("")
+
+  // Fish binary
+  println("Fish binary:")
+  if @fs.path_exists(fish_bin) {
+    println("  OK: " + fish_bin)
+  } else {
+    println("  NOT FOUND: " + fish_bin)
+  }
+  let fish_path = trim_whitespace(run_shell_output("command -v fish"))
+  if fish_path.length() > 0 {
+    println("  PATH: " + fish_path)
+  }
+  let fish_version = trim_whitespace(run_shell_output("fish --version"))
+  if fish_version.length() > 0 {
+    println("  VERSION: " + fish_version)
+  }
+  let build_epoch = trim_whitespace(run_shell_output("stat -f %m " + fish_bin))
+  if build_epoch.length() > 0 {
+    let build_time = trim_whitespace(
+      run_shell_output("date -u -r " + build_epoch + " '+%Y-%m-%dT%H:%M:%SZ'")
+    )
+    if build_time.length() > 0 {
+      println("  BUILT: 🕒 " + build_time)
+    }
+  }
+  println("")
+
+  // Config files
+  println("Config files:")
+  println("  Wrappers:    " + (if @fs.path_exists(wrappers_file) { "OK" } else { "NOT INSTALLED" }))
+  println("  Keymaps:     " + (if @fs.path_exists(keymaps_file) { "OK" } else { "NOT INSTALLED" }))
+  println("  Init script: " + (if @fs.path_exists(init_file) { "OK" } else { "NOT INSTALLED" }))
+  println("")
+
+  // Tracing
+  println("Tracing:")
+  println("  Directory:   " + (if @fs.path_exists(trace_dir) { "OK" } else { "NOT CREATED" }))
+  let observe_ok = @fs.path_exists(observe_dir)
+  let observe_count = if observe_ok { list_dir(observe_dir).length().to_string() } else { "0" }
+  println("  Observe dir: " + (if observe_ok { "OK (" + observe_count + " files)" } else { "NOT FOUND" }))
+  println("  IO trace:    " + (if @fs.path_exists(last_meta) { "OK" } else { "NO META" }))
+  println("")
+
+  // Commands registered
+  let commands = @shell.all_commands()
+  println("Registered commands: " + commands.length().to_string())
+  for cmd in commands {
+    println("  " + cmd.name + " (" + cmd.error_patterns.length().to_string() + " error patterns)")
+  }
+  println("")
+
+  // Keymaps
+  let default_km = @keymap.default_keymap()
+  println("Keybindings: " + default_km.bindings.length().to_string())
+  println("")
+
+  // Status
+  if @fs.path_exists(wrappers_file) && @fs.path_exists(keymaps_file) {
+    println("Status: READY")
+    println("Launch: exec ~/.local/bin/fish")
+  } else {
+    println("Status: NEEDS SETUP")
+    println("Run: fishx install")
+  }
+}
+
+fn show_context() -> Unit {
+  let commands = @shell.all_commands()
+  let home = get_home()
+
+  println("{")
+  println("  \"shell\": \"fish\",")
+  println("  \"enhanced\": true,")
+
+  // CWD
+  let cwd = match @sys.get_env_var("PWD") {
+    Some(p) => p
+    None => home
+  }
+  println("  \"cwd\": \"" + escape_json(cwd) + "\",")
+
+  // User
+  let user = match @sys.get_env_var("USER") {
+    Some(u) => u
+    None => "unknown"
+  }
+  println("  \"user\": \"" + escape_json(user) + "\",")
+
+  // Commands
+  println("  \"commands\": [")
+  for i, cmd in commands {
+    let comma = if i < commands.length() - 1 { "," } else { "" }
+    let line = "    {\"name\": \"" + cmd.name + "\", \"category\": \"" + cmd.category + "\"}" + comma
+    println(line)
+  }
+  println("  ],")
+
+  // Capabilities
+  println("  \"capabilities\": {")
+  println("    \"tracing\": true,")
+  println("    \"errorHandling\": true,")
+  println("    \"agentIntegration\": true")
+  println("  }")
+  println("}")
+}
+
+async fn run_shell_output(command : String) -> String raise {
+  try {
+    let (exit_code, stdout_data, _stderr_data) = @process.collect_output(
+      "sh",
+      ["-c", command],
+      cwd=".",
+    )
+    if exit_code == 0 {
+      stdout_data.text()
+    } else {
+      ""
+    }
+  } catch {
+    _ => ""
+  }
+}
+
+fn get_env_or(key : String, fallback : String) -> String {
+  match @sys.get_env_var(key) {
+    Some(v) => v
+    None => fallback
+  }
+}
+
+fn get_data_dir() -> String {
+  match @sys.get_env_var("XDG_DATA_HOME") {
+    Some(dir) => dir
+    None => get_home() + "/.local/share"
+  }
+}
+
+fn list_dir(path : String) -> Array[String] {
+  try {
+    @fs.read_dir(path)
+  } catch {
+    _ => []
+  }
+}
+
+fn print_shell_command() -> Unit {
+  println("exec ~/.local/bin/fish")
+}
+
+fn get_home() -> String {
+  match @sys.get_env_var("HOME") {
+    Some(h) => h
+    None => "/tmp"
+  }
+}
+
+fn ensure_dir(path : String) -> Unit {
+  if path.length() == 0 || path == "/" || @fs.path_exists(path) {
+    return
+  }
+  let parent = parent_dir(path)
+  if parent.length() > 0 && parent != path {
+    ensure_dir(parent)
+  }
+  try {
+    @fs.create_dir(path)
+  } catch {
+    _ => ()
+  }
+}
+
+fn parent_dir(path : String) -> String {
+  if path == "/" {
+    return "/"
+  }
+  let idx = last_index_of_char(path, '/')
+  if idx <= 0 {
+    ""
+  } else {
+    substring(path, 0, idx)
+  }
+}
+
+fn last_index_of_char(text : String, ch : Char) -> Int {
+  let mut out = -1
+  let mut i = 0
+  for c in text {
+    if c == ch {
+      out = i
+    }
+    i += 1
+  }
+  out
+}
+
+fn substring(text : String, start : Int, end : Int) -> String {
+  let out = StringBuilder::new()
+  let mut i = 0
+  for c in text {
+    if i >= start && i < end {
+      out.write_char(c)
+    }
+    i += 1
+  }
+  out.to_string()
+}
+
+fn repeat(s : String, n : Int) -> String {
+  let result = StringBuilder::new()
+  for _ in 0..<n {
+    result.write_string(s)
+  }
+  result.to_string()
+}
+
+fn trim_whitespace(s : String) -> String {
+  s.trim(chars=" \n\t\r").to_string()
+}
+
+fn escape_json(s : String) -> String {
+  let result = StringBuilder::new()
+  for c in s {
+    match c {
+      '"' => result.write_string("\\\"")
+      '\\' => result.write_string("\\\\")
+      '\n' => result.write_string("\\n")
+      _ => result.write_char(c)
+    }
+  }
+  result.to_string()
+}

@@ -1,0 +1,12 @@
+{
+  "is-main": true,
+  "import": [
+    "nikivdev/moonbit/lib/shell",
+    "nikivdev/moonbit/lib/keymap",
+    "moonbitlang/x/sys",
+    "moonbitlang/x/fs",
+    "moonbitlang/async",
+    "moonbitlang/async/process"
+  ],
+  "support-targets": ["native"]
+}

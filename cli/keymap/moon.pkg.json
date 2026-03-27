@@ -1,0 +1,9 @@
+{
+  "is-main": true,
+  "import": [
+    "moonbitlang/x/sys",
+    "moonbitlang/x/fs",
+    { "path": "nikivdev/moonbit/lib/keymap", "alias": "keymaplib" }
+  ],
+  "support-targets": ["native"]
+}

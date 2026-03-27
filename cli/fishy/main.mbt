@@ -270,14 +270,7 @@ enum FishyAction {
 
 async fn infer_action(prompt : String) -> FishyAction? raise {
   let (model_name, port) = resolve_model_port()
-  let system_prompt =
-    "You convert fish shell requests into JSON. Output ONLY JSON. " +
-    "No markdown, no backticks, no extra text, no explanations. " +
-    "Schema: {\"action\":\"wrap|set|function|unknown\", " +
-    "\"name\":\"\", \"command\":\"\", \"args\":[], " +
-    "\"flags\":\"\", \"var\":\"\", \"values\":[], " +
-    "\"body\":\"\", \"description\":\"\"}. " +
-    "Use empty strings or empty arrays when a field is not needed."
+  let system_prompt = build_fishy_system_prompt()
   let response = prompt_local_model(model_name, port, system_prompt, prompt)
   let parsed = extract_json_object(response)
   match parsed {
@@ -626,6 +619,39 @@ fn first_token(text : String) -> String {
     buf.write_char(c)
   }
   buf.to_string()
+}
+
+fn env_true(name : String) -> Bool {
+  match @sys.get_env_var(name) {
+    Some(value) => {
+      let lower = value.to_lower()
+      lower == "1" || lower == "true" || lower == "yes" || lower == "on"
+    }
+    None => false
+  }
+}
+
+fn allow_cot() -> Bool {
+  env_true("FISHY_ALLOW_COT") || env_true("LM_STUDIO_ALLOW_COT")
+}
+
+fn build_fishy_system_prompt() -> String {
+  let schema =
+    "Schema: {\"action\":\"wrap|set|function|unknown\", " +
+    "\"name\":\"\", \"command\":\"\", \"args\":[], " +
+    "\"flags\":\"\", \"var\":\"\", \"values\":[], " +
+    "\"body\":\"\", \"description\":\"\"}. " +
+    "Use empty strings or empty arrays when a field is not needed."
+  if allow_cot() {
+    "You convert fish shell requests into JSON. " +
+    "You may include reasoning, but you MUST include a final JSON object. " +
+    "The last JSON object in your response will be parsed. " +
+    schema
+  } else {
+    "You convert fish shell requests into JSON. Output ONLY JSON. " +
+    "No markdown, no backticks, no extra text, no explanations. " +
+    schema
+  }
 }
 
 fn substring(text : String, start : Int, end : Int) -> String {

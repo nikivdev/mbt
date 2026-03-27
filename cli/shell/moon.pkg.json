@@ -1,0 +1,11 @@
+{
+  "is-main": true,
+  "import": [
+    { "path": "nikivdev/moonbit/lib/shell", "alias": "shelllib" },
+    "moonbitlang/async",
+    "moonbitlang/async/process",
+    "moonbitlang/x/sys",
+    "moonbitlang/x/fs"
+  ],
+  "support-targets": ["native"]
+}

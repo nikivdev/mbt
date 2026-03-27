@@ -1,0 +1,7 @@
+{
+  "import": [
+    "moonbitlang/x/fs",
+    "moonbitlang/async/process"
+  ],
+  "support-targets": ["native"]
+}
