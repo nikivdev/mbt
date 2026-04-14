@@ -19,7 +19,7 @@ classifiers = [
 dependencies = [
     "openai>=2.3.0",
     "pydantic>=2.12.2",
-    "pytest>=8.4.2",
+    "pytest>=9.0.3",
 ]
 
 [project.urls]
